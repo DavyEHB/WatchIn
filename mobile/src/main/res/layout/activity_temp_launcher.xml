@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".activities.TempLauncher">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log In"
+        android:id="@+id/btnLoginAct"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickLogin"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Main"
+        android:id="@+id/btnSwipe"
+        android:layout_below="@+id/btnLoginAct"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickSwipe"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button 1"
+        android:id="@+id/btnCheckMail"
+        android:layout_below="@+id/btnSwipe"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickGetByID"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Count Contacts"
+        android:id="@+id/btnTemp2"
+        android:layout_below="@+id/btnCheckMail"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickBtn2"/>
+</RelativeLayout>

@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="be.ehb.watchin.fragments.PersonalDetail"
+    android:rowCount="3"
+    android:columnCount="3"
+    android:padding="20dp">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/imProfilePic"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:src="@mipmap/dummy"
+        android:background="@color/black"
+        android:adjustViewBounds="false"
+        android:padding="2dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imProfilePic"
+        android:layout_toEndOf="@+id/imProfilePic"
+        android:layout_marginLeft="15dp"
+        android:id="@+id/linearLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="FullName"
+            android:id="@+id/txtFullName" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Company"
+            android:id="@+id/txtCompany" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Email@Server.net"
+            android:id="@+id/txtEmail" />
+    </LinearLayout>
+
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lvMyEvents"
+        android:layout_below="@+id/imProfilePic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:choiceMode="singleChoice" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignStart="@+id/linearLayout"
+        android:layout_marginTop="5dp">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@mipmap/contact_list2"
+            android:cropToPadding="false"
+            android:adjustViewBounds="true"
+            android:layout_below="@+id/linearLayout"
+            android:layout_alignStart="@+id/linearLayout" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="100"
+            android:id="@+id/txtContacts"
+            android:layout_below="@+id/linearLayout"
+            android:layout_toEndOf="@+id/imageView"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>
