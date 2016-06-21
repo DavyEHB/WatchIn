@@ -31,7 +31,7 @@ public class SkillResultReceiver extends ResultReceiver {
 
     public interface ReceiveSkill {
 
-        void onReceiveSkill(Bundle contact);
+        void onReceive(int PID,String skill);
           void onError();
 
     }
@@ -46,7 +46,10 @@ public class SkillResultReceiver extends ResultReceiver {
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         if (mReceiver!=null) {
             if (resultCode == RESULT_ONE) {
-                mReceiver.onReceiveSkill(resultData);
+                String skill = resultData.getString(SkillRestService.BUN_SKILL);
+                int PID = resultData.getInt(SkillRestService.BUN_PID);
+
+                mReceiver.onReceive(PID,skill);
             } else if (resultCode == ERROR_RECEIVING) {
                 mReceiver.onError();
             }

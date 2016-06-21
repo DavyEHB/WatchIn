@@ -1,12 +1,9 @@
 package be.ehb.watchin.services.PersonDAO;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,7 @@ public class PersonResultReceiver extends ResultReceiver {
     public interface ReceivePerson {
 
         void onReceive(Person person);
-        void onReceiveAll(Map<Integer,Person> persons);
+        void onReceiveAllPersons(Map<Integer,Person> persons);
         void onError();
 
     }
@@ -57,7 +54,7 @@ public class PersonResultReceiver extends ResultReceiver {
                 {
                     personMap.put(p.getID(),p);
                 }
-                mPersonReceiver.onReceiveAll(personMap);
+                mPersonReceiver.onReceiveAllPersons(personMap);
             } else if (resultCode == ERROR_RECEIVING) {
                 mPersonReceiver.onError();
             }

@@ -22,9 +22,8 @@ import java.util.UUID;
 public class Event implements Serializable {
     private int ID;
     private String name;
-    private Date date;
-    private Time startTime;
-    private Time endTime;
+    private Date startTime;
+    private Date endTime;
     private String location;
     private UUID uuid;
     private List<Person> attendees = new ArrayList<>();
@@ -53,27 +52,19 @@ public class Event implements Serializable {
         this.name = name;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Time getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Time startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public Time getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Time endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
@@ -129,6 +120,11 @@ public class Event implements Serializable {
 
     @Override
     public String toString() {
-        return "Event: " + this.name + " ID: "  + this.ID;
+        return "Event: ID: "  + this.ID + "\n"
+                + "\tName: " + this.name + "\n"
+                + "\tLocation: " + this.location + "\n"
+                + "\tStart: " + this.startTime + "\n"
+                + "\tEnd: " + this.endTime + "\n"
+                + "\tUUID: " + this.uuid;
     }
 }

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.model.Person;
 
 
@@ -53,15 +54,15 @@ public class SkillRestService extends IntentService {
     private static final String TAG = "SkillRestService";
     private static final int MY_SOCKET_TIMEOUT_MS = 5000;
     public static final String BUN_ID = "ID";
-    private static final String JSON_ID = "ID";
+    private static final String JSON_ID = "id";
     public static final String BUN_PID = "PID";
-    private static final String JSON_PID = "PID";
+    private static final String JSON_PID = "pid";
     public static final String BUN_SKILL = "SKILL";
     private static final String JSON_SKILL = "skill";
 
-    private static String server = "192.168.56.1:8080";
+    private static String server = WatchInApp.server;
+    private static String path = WatchInApp.path.skills;
 
-    private static String path = "/WatchIn/data/skills/";
 
     private ResultReceiver resultReceiver;
     private Response.ErrorListener errorListener = new Response.ErrorListener() {

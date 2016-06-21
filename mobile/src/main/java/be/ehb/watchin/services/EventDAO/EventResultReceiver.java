@@ -5,7 +5,13 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.os.ResultReceiver;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import be.ehb.watchin.model.Event;
+import be.ehb.watchin.model.Person;
 
 /**
  * Created by davy.van.belle on 14/06/2016.
@@ -34,6 +40,7 @@ public class EventResultReceiver extends ResultReceiver {
     public interface ReceiveEvent {
 
         void onReceiveEvent(Event event);
+        void onReceiveAllEvents(Map<Integer,Event> eventMap);
         void onError();
 
     }
@@ -48,10 +55,18 @@ public class EventResultReceiver extends ResultReceiver {
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         if (mReceiver!=null) {
             if (resultCode == RESULT_ONE) {
-                Event event = (Event) resultData.getSerializable(EventRestService.EVENT);
+                Event event = (Event) resultData.getSerializable(EventRestService.BUN_EVENT);
                 mReceiver.onReceiveEvent(event);
             } else if (resultCode == ERROR_RECEIVING) {
                 mReceiver.onError();
+            } else if (resultCode ==RESULT_ALL) {
+                List<Event> result = (List<Event>) resultData.getSerializable(EventRestService.BUN_EVENT_LIST);
+                Map<Integer,Event> eventMap = new LinkedHashMap<>();
+                for (Event e : result)
+                {
+                    eventMap.put(e.getID(),e);
+                }
+                mReceiver.onReceiveAllEvents(eventMap);
             }
         }
 

@@ -38,18 +38,13 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder Date(Date date){
-        mEvent.setDate(date);
+    public EventBuilder StartTime(Date start){
+        mEvent.setStartTime(start);
         return this;
     }
 
-    public EventBuilder StartTime(Time time){
-        mEvent.setStartTime(time);
-        return this;
-    }
-
-    public EventBuilder EndTime(Time time){
-        mEvent.setEndTime(time);
+    public EventBuilder EndTime(Date end){
+        mEvent.setEndTime(end);
         return this;
     }
 

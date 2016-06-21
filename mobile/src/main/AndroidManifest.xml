@@ -48,6 +48,10 @@
         <service
             android:name=".services.ContactDAO.ContactRestService"
             android:exported="false"/>
+        <service
+            android:name=".services.EventDAO.EventRestService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

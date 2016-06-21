@@ -67,7 +67,7 @@ public class PersonalDetail extends FragmentTemplate {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         int myID = ((WatchInApp) getActivity().getApplication()).MyID();
-        me = ((WatchInApp) getActivity().getApplication()).Persons().get(myID);
+        me = ((WatchInApp) getActivity().getApplication()).Persons.get(myID);
     }
 
 

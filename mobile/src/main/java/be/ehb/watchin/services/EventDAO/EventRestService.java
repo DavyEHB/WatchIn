@@ -24,10 +24,13 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.builders.EventBuilder;
@@ -47,18 +50,19 @@ public class EventRestService extends IntentService {
 
     private static final String TAG = "EventRestService";
     private static final int MY_SOCKET_TIMEOUT_MS = 5000;
-    public static final String EVENT = "event";
+
+    public static final String BUN_EVENT = "BUNDLE_EVENT";
+    public static final String BUN_EVENT_LIST = "BUNDLE_EVENT_LIST";
 
     private static String server = WatchInApp.server;
     private static String path = WatchInApp.path.events;
 
-    public static final String JSON_CID = "CID";
-    public static final String BUN_CID = "BUN_CID";
-    public static final String JSON_PID = "PID";
-    public static final String BUN_PID = "BUN_PID";
-    public static final String JSON_ID = "ID";
-    public static final String BUN_ID = "BUN_ID";
-
+    private static final String JSON_NAME = "name";
+    private static final String JSON_LOC = "location";
+    private static final String JSON_START_DATE = "startTime";
+    private static final String JSON_END_DATE = "endTime";
+    private static final String JSON_ID = "id";
+    private static final String JSON_UUID = "uuid";
 
     private ResultReceiver resultReceiver;
     private Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -69,7 +73,6 @@ public class EventRestService extends IntentService {
             resultReceiver.send(EventResultReceiver.ERROR_RECEIVING,null);
         }
     };
-
 
     public EventRestService() {
         super("EventRestService");
@@ -182,74 +185,58 @@ public class EventRestService extends IntentService {
             Log.d(TAG, jsonObject.toString());
             */
 
-           // Date date = SimpleDateFormat.getDateTimeInstance().parse(jsonObject.getString("2016-05-19T07:00:00+02:00"));
-                    /*
-            Event event = new EventBuilder()
-                    .ID(jsonObject.getInt(JSON_ID))
-                    .Name(jsonObject.getString(JSON_NAME))
-                    .Location(jsonObject.getString(JSON_LOC))
-                    .Date(
-                    .
-
-*/
             Bundle bundle = new Bundle();
-            try {
-                bundle.putInt(BUN_ID,jsonObject.getInt(JSON_ID));
-                bundle.putInt(BUN_PID,jsonObject.getInt(JSON_PID));
-                bundle.putInt(BUN_CID,jsonObject.getInt(JSON_CID));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            //Log.d(TAG,bundle.toString());
+            bundle.putSerializable(BUN_EVENT,jsonToEvent(jsonObject));
             resultReceiver.send(EventResultReceiver.RESULT_ONE,bundle);
         }
     };
 
+
     private Response.Listener<JSONArray> jsonGetAllResponse = new Response.Listener<JSONArray>(){
         @Override
         public void onResponse(JSONArray response) {
-            /*
-            Log.d(TAG,"We have array response");
-            Log.d(TAG,response.toString());
-            */
-
-            for (int i =0 ; i < response.length();i++){
+            ArrayList<Event> eventList = new ArrayList<>();
+            for (int i = 0; i< response.length(); i++){
                 JSONObject jsonObject = null;
-                Bundle bundle = new Bundle();
                 try {
                     jsonObject = response.getJSONObject(i);
-                    bundle.putInt(BUN_ID,jsonObject.getInt(JSON_ID));
-                    bundle.putInt(BUN_PID,jsonObject.getInt(JSON_PID));
-                    bundle.putInt(BUN_CID,jsonObject.getInt(JSON_CID));
+                    eventList.add(jsonToEvent(jsonObject));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //Log.d(TAG,bundle.toString());
-                resultReceiver.send(EventResultReceiver.RESULT_ONE,bundle);
             }
+            Bundle  bundle = new Bundle();
+            bundle.putSerializable(BUN_EVENT_LIST,eventList);
+            resultReceiver.send(EventResultReceiver.RESULT_ALL,bundle);
         }
     };
-/*
-    private Event jsonToEvent(JSONObject jsonObject)
-    {
+    private Event jsonToEvent(JSONObject jsonObject) {
+        Date start_date = null;
+        Date end_date = null;
+        Event event = null;
         try {
-            int id = jsonObject.getInt(JSON_ID);
-            Person person = new Person();
-            person.setID(id);
-            person.setFirstName(jsonObject.getString("firstName"));
-            person.setLastName(jsonObject.getString("lastName"));
-            person.setAge(jsonObject.getInt("age"));
-            person.setBeaconID(jsonObject.getString("beaconID"));
-            person.setCompany(jsonObject.getString("company"));
-            person.setEmail(jsonObject.getString("email"));
-            byte[] data = jsonObject.getString("photo").getBytes();
-            person.setPhoto(BitmapFactory.decodeByteArray(data,0,data.length));
-            return person;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd,HH:00");
+            start_date = sdf.parse(jsonObject.getString(JSON_START_DATE));
+            end_date = sdf.parse(jsonObject.getString(JSON_END_DATE));
+
+            event = new EventBuilder()
+                    .ID(jsonObject.getInt(JSON_ID))
+                    .Name(jsonObject.getString(JSON_NAME))
+                    .Location(jsonObject.getString(JSON_LOC))
+                    .StartTime(start_date)
+                    .EndTime(end_date)
+                    .UUID(UUID.fromString(jsonObject.getString(JSON_UUID)))
+                    .create();
+
+            Log.d(TAG,event.toString());
+            return event;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
-    */
-
 }

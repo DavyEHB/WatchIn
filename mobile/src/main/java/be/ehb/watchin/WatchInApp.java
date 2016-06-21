@@ -5,6 +5,7 @@ import android.app.Application;
 import java.util.HashMap;
 import java.util.Map;
 
+import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
 
 /**
@@ -15,20 +16,23 @@ public class WatchInApp extends Application {
     private int myID;
     private String myEmail = "";
     private boolean loggedIn = false;
+    public final Map<Integer,Person> Persons = new HashMap<>();
+    public final Map<Integer,Event> Events = new HashMap<>();
 
     public static String server = "192.168.56.1:8080";
 
 
     public static class path{
         private static final String base_path = "/WatchInServer/data/";
-        public static final String events = base_path + "/events/";
-        public static final String persons = base_path + "/persons/";
-        public static final String contacts = base_path + "/contacts/";
+        public static final String events = base_path + "events/";
+        public static final String persons = base_path + "persons/";
+        public static final String contacts = base_path + "contacts/";
+        public static final String skills = base_path + "skills/";
     }
 
     //private final List<Person> myPersons = new ArrayList<>();
 
-    private final Map<Integer,Person> myPersons = new HashMap<>();
+
 
     public int MyID() {
         return myID;
@@ -51,7 +55,7 @@ public class WatchInApp extends Application {
 
     public Person Me()
     {
-        return Persons().get(myID);
+        return Persons.get(myID);
     }
 
     public void Me(Person me)
@@ -73,8 +77,4 @@ public class WatchInApp extends Application {
         myID = 0;
     }
 
-    public Map<Integer,Person> Persons()
-    {
-        return myPersons;
-    }
 }

@@ -30,18 +30,19 @@ import be.ehb.watchin.fragments.EventFragment.EventListFragment;
 import be.ehb.watchin.fragments.FragmentTemplate;
 import be.ehb.watchin.fragments.PersonalDetail;
 import be.ehb.watchin.fragments.PersonsFragment.PersonListFragment;
-import be.ehb.watchin.fragments.PersonsFragment.PersonViewAdapter;
+import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
-import be.ehb.watchin.model.dummy.DummyPersonList;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
+import be.ehb.watchin.services.EventDAO.EventRestService;
+import be.ehb.watchin.services.EventDAO.EventResultReceiver;
 import be.ehb.watchin.services.PersonDAO.PersonRestService;
 import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 import be.ehb.watchin.services.SkillDAO.SkillRestService;
 import be.ehb.watchin.services.SkillDAO.SkillResultReceiver;
 
 public class WatchInMain extends AppCompatActivity implements PersonListFragment.OnListFragmentInteractionListener, PersonResultReceiver.ReceivePerson,
-        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact {
+        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent {
 
     private static final String TAG = "WatchinMain";
     /**
@@ -57,6 +58,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     private ProgressDialog progress;
 
     private FragmentTemplate personList = PersonListFragment.newInstance();
+    private FragmentTemplate eventList = EventListFragment.newInstance();
 
     public static final String PREFS_NAME = "WatchInPrefs";
     public static final String PREFS_ID = "UserID";
@@ -73,31 +75,15 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
      */
     private ViewPager mViewPager;
     private int progressCount = 0;
-    private List<Person> mPersons = new ArrayList<>();
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // TODO: Uncomment section
-        /*
-        if (!((WatchInApp) getApplication()).isLoggedIn())
-        {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        */
-
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         int userID = settings.getInt(WatchInMain.PREFS_ID,0);
         String email = settings.getString(WatchInMain.PREFS_EMAIL,"");
         boolean isLoggedIn = settings.getBoolean(WatchInMain.PREFS_LOGIN,false);
-
-        Log.d(TAG,"user ID: " + userID);
-        Log.d(TAG,"email: " + email);
-        Log.d(TAG,"logged: " + isLoggedIn);
 
         if ((userID != 0)&&(isLoggedIn)){
             ((WatchInApp) getApplication()).MyID(userID);
@@ -123,9 +109,8 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         }
         */
 
-        getPersonsFromServer();
-
-
+        getPersons();
+        getEvents();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -169,31 +154,28 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         */
     }
 
-    @Override
-    public void onReceiveAll(Map<Integer,Person> persons) {
-        Log.d(TAG,"Receiving All");
+    public void onReceiveAllPersons(Map<Integer,Person> persons) {
+        Log.d(TAG,"Receiving All Persons");
         progressCount--;
-        ((WatchInApp) getApplication()).Persons().clear();
-        ((WatchInApp) getApplication()).Persons().putAll(persons);
+        ((WatchInApp) getApplication()).Persons.clear();
+        ((WatchInApp) getApplication()).Persons.putAll(persons);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
         getSkills();
         getContacts();
 
+
         if (progressCount == 0) {
             progress.dismiss();
         }
     }
 
     @Override
-    public void onReceiveSkill(Bundle skill) {
+    public void onReceive(int PID,String skill) {
         progressCount--;
         Log.d(TAG,"Receiving skill");
-        int ID = skill.getInt(SkillRestService.BUN_ID);
-        int PID = skill.getInt(SkillRestService.BUN_PID);
-        String mSkill = skill.getString(SkillRestService.BUN_SKILL);
-        Person p = ((WatchInApp) getApplication()).Persons().get(PID);
-        p.Skills().add(mSkill);
+        Person p = ((WatchInApp) getApplication()).Persons.get(PID);
+        p.Skills().add(skill);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
 
@@ -201,13 +183,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
             progress.dismiss();
         }
     }
-
-    /*
-    @Override
-    public void onReceiveAll(Bundle skills) {
-
-    }
-    */
 
     @Override
     public void onReceiveContact(Bundle contact) {
@@ -217,8 +192,8 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         int PID = contact.getInt(ContactRestService.BUN_PID);
         int CID = contact.getInt(ContactRestService.BUN_CID);
 
-        Person p = ((WatchInApp) getApplication()).Persons().get(PID);
-        Person c = ((WatchInApp) getApplication()).Persons().get(CID);
+        Person p = ((WatchInApp) getApplication()).Persons.get(PID);
+        Person c = ((WatchInApp) getApplication()).Persons.get(CID);
         p.Contacts().add(c);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
@@ -227,6 +202,31 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
             progress.dismiss();
         }
     }
+
+    @Override
+    public void onReceiveEvent(Event event) {
+
+    }
+
+    public void onReceiveAllEvents(Map<Integer, Event> eventMap) {
+        Log.d(TAG,"Receiving All Events");
+        progressCount--;
+
+        ((WatchInApp) getApplication()).Events.clear();
+        ((WatchInApp) getApplication()).Events.putAll(eventMap);
+
+        ((EventListFragment) eventList).notifyDataSetChanged();
+
+        Map<Integer,Event> integerEventMap = ((WatchInApp)getApplication()).Events;
+        Log.d(TAG,"Global Map: " +integerEventMap.toString());
+
+        Log.d("SYSTEM_ID", "Receive Events: "+String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Events)));
+
+        if (progressCount == 0) {
+            progress.dismiss();
+        }
+    }
+
 
     @Override
     public void onError() {
@@ -246,13 +246,18 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         progressCount++;
     }
 
-    private void getEventsFromServer()
+    private void getEvents()
     {
+        Log.d(TAG,"Loading Events");
+        EventResultReceiver eventResultReceiver = new EventResultReceiver();
+        eventResultReceiver.setReceiver(this);
+        EventRestService.startActionGetAll(this,eventResultReceiver);
         progressCount++;
     }
 
-    private void getPersonsFromServer()
+    private void getPersons()
     {
+        Log.d(TAG,"Loading Persons");
         PersonResultReceiver personResultReceiver = new PersonResultReceiver();
         personResultReceiver.setPersonReceiver(this);
         PersonRestService.startActionGetAll(this,personResultReceiver);
@@ -292,7 +297,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -340,7 +344,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
                 .skill("Networking")
                 .skill("Doinig everything")
                 .create();
-        ((WatchInApp)getApplication()).Persons().put(p2.getID(),p2);
+        ((WatchInApp)getApplication()).Persons.put(p2.getID(),p2);
         ((PersonListFragment) personList).notifyDataSetChanged();
     }
 
@@ -355,8 +359,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
             super(fm);
         }
         private FragmentTemplate personalDetail = PersonalDetail.newInstance("Me");
-        private FragmentTemplate eventList = EventListFragment.newInstance();
-
 
         @Override
         public FragmentTemplate getItem(int position) {

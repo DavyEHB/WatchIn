@@ -12,22 +12,31 @@ import android.widget.Toast;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
+import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
+import be.ehb.watchin.model.dummy.DummyEventList;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
+import be.ehb.watchin.services.EventDAO.EventRestService;
+import be.ehb.watchin.services.EventDAO.EventResultReceiver;
 import be.ehb.watchin.services.PersonDAO.PersonRestService;
 import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 import be.ehb.watchin.services.SkillDAO.SkillRestService;
 import be.ehb.watchin.services.SkillDAO.SkillResultReceiver;
 
-public class TempLauncher extends AppCompatActivity implements ContactResultReceiver.ReceiveContact{
+public class TempLauncher extends AppCompatActivity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent {
 
     private static final String TAG = "TempLauncher";
 
@@ -62,30 +71,15 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
     public void onClickGetByID(View view)
     {
-        /*
-        Log.d(TAG,"loading skill");
-        SkillResultReceiver skillResultReceiver = new SkillResultReceiver();
-        skillResultReceiver.setReceiver(this);
-        SkillRestService.startActionGetAll(this,skillResultReceiver);
-        */
 
-        /*
-        Log.d(TAG,"Loading contacts");
-        ContactResultReceiver contactResultReceiver = new ContactResultReceiver();
-        contactResultReceiver.setReceiver(this);
-        ContactRestService.startActionGetAll(this,contactResultReceiver);
-        */
+        Map<Integer,Event> integerEventMap = ((WatchInApp)getApplication()).Events;
+        Log.d(TAG,"Global Map: " +integerEventMap.toString());
+        Log.d("SYSTEM_ID", "Persons: " + String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Persons)));
+        Log.d("SYSTEM_ID", "Events: "+ String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Events)));
 
-        Date date = null;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-            date = sdf.parse("2016-05-19T00:00:00+02:00");
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG,date.toString());
     }
+
+
 
     /*
     @Override
@@ -105,7 +99,7 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
     /*
     @Override
-    public void onReceiveAll(Bundle skills) {
+    public void onReceiveAllPersons(Bundle skills) {
         Log.d(TAG,"Receiving all skills");
         Log.d(TAG,skills.toString());
         ArrayList<Bundle> skillsArray = (ArrayList<Bundle>) skills.getSerializable(SkillRestService.BUN_SKILL);
@@ -128,10 +122,23 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
         p.Skills().add(mSkill);
         Log.d(TAG,p.toString());
         */
-        Person p = ((WatchInApp) getApplication()).Persons().get(PID);
-        Person c = ((WatchInApp) getApplication()).Persons().get(CID);
+        Person p = ((WatchInApp) getApplication()).Persons.get(PID);
+        Person c = ((WatchInApp) getApplication()).Persons.get(CID);
         p.Contacts().add(c);
     }
+
+    @Override
+    public void onReceiveEvent(Event event) {
+        Log.d(TAG,"Receiving events in temp");
+        Log.d(TAG,event.toString());
+    }
+
+    @Override
+    public void onReceiveAllEvents(Map<Integer, Event> eventMap) {
+        Log.d(TAG,"Receiving all events in temp");
+        Log.d(TAG,eventMap.toString());
+    }
+
 
     @Override
     public void onError() {
@@ -142,7 +149,7 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
         Log.d(TAG,"===BTN 2 Click ===");
 
-        Map<Integer,Person> personList =((WatchInApp) getApplication()).Persons();
+        Map<Integer,Person> personList =((WatchInApp) getApplication()).Persons;
         List<Person> mutual = null;
         Person me = ((WatchInApp) getApplication()).Me();
 

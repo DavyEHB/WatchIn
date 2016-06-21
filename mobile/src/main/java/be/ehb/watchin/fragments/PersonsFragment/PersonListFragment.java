@@ -65,7 +65,7 @@ public class PersonListFragment extends FragmentTemplate {
         if (getArguments() != null) {
             mTitle = getArguments().getString(ARG_TITLE);
         }
-        mPersons = ((WatchInApp) getActivity().getApplication()).Persons();
+        mPersons = ((WatchInApp) getActivity().getApplication()).Persons;
         myID = ((WatchInApp) getActivity().getApplication()).MyID();
     }
 
@@ -120,7 +120,7 @@ public class PersonListFragment extends FragmentTemplate {
 
     public void notifyDataSetChanged()
     {
-        //Log.d(TAG,"data changed");
+        //Log.d(TAG,"data changed: " + mPersons.toString());
         personViewAdapter.refresh(myID,mPersons);
         personViewAdapter.notifyDataSetChanged();
     }

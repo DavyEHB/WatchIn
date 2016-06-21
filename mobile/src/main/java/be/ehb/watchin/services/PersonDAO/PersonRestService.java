@@ -272,7 +272,7 @@ public class PersonRestService extends IntentService {
     private Person jsonToPerson(JSONObject jsonObject)
     {
         try {
-            int id = jsonObject.getInt("ID");
+            int id = jsonObject.getInt("id");
             Person person = new Person();
             person.setID(id);
             person.setFirstName(jsonObject.getString("firstName"));

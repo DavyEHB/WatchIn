@@ -48,11 +48,11 @@ public class ContactRestService extends IntentService{
     private static String server = WatchInApp.server;
     private static String path = WatchInApp.path.contacts;
 
-    public static final String JSON_CID = "CID";
+    public static final String JSON_CID = "cid";
     public static final String BUN_CID = "BUN_CID";
-    public static final String JSON_PID = "PID";
+    public static final String JSON_PID = "pid";
     public static final String BUN_PID = "BUN_PID";
-    public static final String JSON_ID = "ID";
+    public static final String JSON_ID = "id";
     public static final String BUN_ID = "BUN_ID";
 
     private ResultReceiver resultReceiver;

@@ -28,11 +28,10 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
     private int mID;
 
     public PersonViewAdapter(int myID,Map<Integer,Person> persons, PersonListFragment.OnListFragmentInteractionListener listener) {
-        mListener = listener;
+         mListener = listener;
         mPersons = persons;
         mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
         mID = myID;
-
     }
 
     @Override
