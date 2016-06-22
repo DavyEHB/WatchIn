@@ -30,11 +30,9 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
 
     public EventViewAdapter(int myID, Map<Integer,Event> events, EventListFragment.OnListFragmentInteractionListener listener) {
         mID= myID;
-        Log.d("SYSTEM_ID", "Constructor Events: " + String.valueOf(System.identityHashCode(mEvents)));
         mEvents =  events;
         mKeys = mEvents.keySet().toArray(new Integer[mEvents.size()]);
         mListener = listener;
-        Log.d("SYSTEM_ID", "Constructor Events: " + String.valueOf(System.identityHashCode(mEvents)));
     }
 
     @Override
@@ -84,8 +82,6 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
 
     @Override
     public int getItemCount() {
-        Log.d(TAG,"getItemCount: " + mEvents.size());
-        Log.d("SYSTEM_ID", "Count Events: " + String.valueOf(System.identityHashCode(mEvents)));
         return mEvents.size();
     }
 
@@ -93,7 +89,6 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
         mID = myID;
         mEvents = events;
         mKeys = events.keySet().toArray(new Integer[events.size()]);
-        Log.d("SYSTEM_ID", "Refresh Events: " + String.valueOf(System.identityHashCode(mEvents)));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

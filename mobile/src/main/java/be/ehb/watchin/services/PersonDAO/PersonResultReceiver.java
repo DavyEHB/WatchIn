@@ -17,15 +17,20 @@ import be.ehb.watchin.model.Person;
 public class PersonResultReceiver extends ResultReceiver {
 
     public static final int ERROR_RECEIVING = 0;
-    public static int RESULT_ALL = 2;
-    public static int RESULT_ONE = 1;
+    public static final int RESULT_ALL = 2;
+    public static final int RESULT_ONE = 1;
 
     private static Creator CREATOR;
 
     private ReceivePerson mPersonReceiver;
 
-    public PersonResultReceiver() {
+    private PersonResultReceiver() {
         super(new Handler());
+    }
+
+    public PersonResultReceiver(ReceivePerson receiver) {
+        super(new Handler());
+        mPersonReceiver = receiver;
     }
 
     public interface ReceivePerson {
@@ -33,14 +38,7 @@ public class PersonResultReceiver extends ResultReceiver {
         void onReceive(Person person);
         void onReceiveAllPersons(Map<Integer,Person> persons);
         void onError();
-
     }
-
-    public void setPersonReceiver(ReceivePerson receiver) {
-        mPersonReceiver = receiver;
-    }
-
-
 
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {

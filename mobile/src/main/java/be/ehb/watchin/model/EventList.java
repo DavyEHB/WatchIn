@@ -33,8 +33,9 @@ public class EventList extends ArrayList<Event>{
 
     public boolean add(Event event){
         if ((!super.contains(event))&&(event != null)) {
+            Boolean ret = super.add(event);
             event.Attendees().add(person);
-            return super.add(event);
+            return ret;
         }
         return false;
     }
@@ -42,8 +43,8 @@ public class EventList extends ArrayList<Event>{
     @Override
     public void add(int index, Event event) {
         if ((!super.contains(event))&&(event != null)) {
-            event.Attendees().add(person);
             super.add(index, event);
+            event.Attendees().add(person);
         }
     }
 
@@ -51,8 +52,9 @@ public class EventList extends ArrayList<Event>{
     public Event remove(int index) {
         Event event = super.get(index);
         if(super.contains(event)){
+            Event ret = super.remove(index);
             event.Attendees().remove(person);
-            return super.remove(index);
+            return ret ;
         }
         return event;
     }

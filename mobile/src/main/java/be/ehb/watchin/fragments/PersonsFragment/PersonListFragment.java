@@ -35,9 +35,9 @@ public class PersonListFragment extends FragmentTemplate {
 
     private OnListFragmentInteractionListener mListener;
     private Map<Integer,Person> mPersons = new HashMap<>();
-    private int myID = 0;
+    private Person me;
 
-    private PersonViewAdapter personViewAdapter = new PersonViewAdapter(myID,mPersons, mListener);
+    private PersonViewAdapter personViewAdapter = new PersonViewAdapter(me,mPersons, mListener);
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -65,8 +65,12 @@ public class PersonListFragment extends FragmentTemplate {
         if (getArguments() != null) {
             mTitle = getArguments().getString(ARG_TITLE);
         }
-        mPersons = ((WatchInApp) getActivity().getApplication()).Persons;
-        myID = ((WatchInApp) getActivity().getApplication()).MyID();
+        mPersons.putAll(((WatchInApp) getActivity().getApplication()).Persons);
+
+        me = ((WatchInApp) getActivity().getApplication()).Me();
+        if (me != null) {
+            mPersons.remove(me.getID());
+        }
     }
 
     @Override
@@ -121,7 +125,13 @@ public class PersonListFragment extends FragmentTemplate {
     public void notifyDataSetChanged()
     {
         //Log.d(TAG,"data changed: " + mPersons.toString());
-        personViewAdapter.refresh(myID,mPersons);
+        mPersons.putAll(((WatchInApp) getActivity().getApplication()).Persons);
+
+        me = ((WatchInApp) getActivity().getApplication()).Me();
+        if (me != null) {
+            mPersons.remove(me.getID());
+        }
+        personViewAdapter.refresh(me,mPersons);
         personViewAdapter.notifyDataSetChanged();
     }
 }

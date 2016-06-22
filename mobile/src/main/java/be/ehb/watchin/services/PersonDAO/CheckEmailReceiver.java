@@ -29,12 +29,12 @@ public class CheckEmailReceiver extends ResultReceiver{
     }
 
 
-    public CheckEmailReceiver() {
+    private CheckEmailReceiver() {
         super(new Handler());
     }
 
-    public void setResultCallback(ResultCallback callback)
-    {
+    public CheckEmailReceiver(ResultCallback callback) {
+        super(new Handler());
         resultCallback = callback;
     }
 

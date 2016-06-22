@@ -33,8 +33,13 @@ public class EventResultReceiver extends ResultReceiver {
      * <var>handler</var> if given, or from an arbitrary thread if null.
      *
      */
-    public EventResultReceiver() {
+    private EventResultReceiver() {
         super(new Handler());
+    }
+
+    public EventResultReceiver(ReceiveEvent receiver) {
+        super(new Handler());
+        mReceiver = receiver;
     }
 
     public interface ReceiveEvent {

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import be.ehb.watchin.WatchInApp;
+import be.ehb.watchin.activities.WatchInMain;
 import be.ehb.watchin.model.Person;
 
 
@@ -42,15 +43,15 @@ import be.ehb.watchin.model.Person;
 public class PersonRestService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_GETBYID = "be.ehb.restclient.services.action.GET";
-    private static final String ACTION_GETALL = "be.ehb.restclient.services.action.GETALL";
-    private static final String ACTION_CREATE = "be.ehb.restclient.services.action.CREATE";
-    private static final String ACTION_CHECK_EMAIL = "be.ehb.restclient.services.action.CHECK_EMAIL";
+    private static final String ACTION_GETBYID = "be.ehb.personrest.services.action.GET";
+    private static final String ACTION_GETALL = "be.ehb.personrest.services.action.GETALL";
+     private static final String ACTION_CREATE = "be.ehb.personrest.services.action.CREATE";
+    private static final String ACTION_CHECK_EMAIL = "be.ehb.personrest.services.action.CHECK_EMAIL";
 
     // TODO: Rename parameters
-    private static final String EXTRA_ID = "be.ehb.restclient.services.extra.ID";
-    private static final String EXTRA_RECEIVER = "be.ehb.restclient.services.extra.RECEIVER";
-    private static final String EXTRA_EMAIL = "be.ehb.restclient.services.extra.EMAIL";
+    private static final String EXTRA_ID = "be.ehb.personrest.services.extra.ID";
+    private static final String EXTRA_RECEIVER = "be.ehb.personrest.services.extra.RECEIVER";
+    private static final String EXTRA_EMAIL = "be.ehb.personrest.services.extra.EMAIL";
 
     private static final String TAG = "SkillRestService";
     private static final int MY_SOCKET_TIMEOUT_MS = 5000;
@@ -246,7 +247,7 @@ public class PersonRestService extends IntentService {
         }
     };
 
-    private Response.Listener<JSONArray> jsonGetAllResponse = new Response.Listener<JSONArray>(){
+     private Response.Listener<JSONArray> jsonGetAllResponse = new Response.Listener<JSONArray>(){
         @Override
         public void onResponse(JSONArray response) {
             //Log.d(TAG,"We have array response");
@@ -289,5 +290,4 @@ public class PersonRestService extends IntentService {
         }
         return null;
     }
-
 }

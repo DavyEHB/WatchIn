@@ -51,6 +51,9 @@
         <service
             android:name=".services.EventDAO.EventRestService"
             android:exported="false"/>
+        <service
+            android:name=".services.AttendeeDAO.AttendeeRestService"
+            android:exported="false"/>
 
     </application>
 

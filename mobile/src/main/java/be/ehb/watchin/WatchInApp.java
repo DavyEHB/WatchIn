@@ -28,6 +28,7 @@ public class WatchInApp extends Application {
         public static final String persons = base_path + "persons/";
         public static final String contacts = base_path + "contacts/";
         public static final String skills = base_path + "skills/";
+        public static final String attendees = base_path + "attendees/";
     }
 
     //private final List<Person> myPersons = new ArrayList<>();
@@ -38,9 +39,11 @@ public class WatchInApp extends Application {
         return myID;
     }
 
+
     public void MyID(int id) {
         this.myID = id;
     }
+
 
     public String MyEmail()
     {
@@ -55,12 +58,12 @@ public class WatchInApp extends Application {
 
     public Person Me()
     {
-        return Persons.get(myID);
+        return Persons.get(this.myID);
     }
 
     public void Me(Person me)
     {
-        this.MyID(me.getID());
+        this.myID = me.getID();
     }
 
     public boolean isLoggedIn()

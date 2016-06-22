@@ -58,7 +58,6 @@ public class EventListFragment extends FragmentTemplate {
         }
         mEvents = ((WatchInApp) getActivity().getApplication()).Events;
         myID = ((WatchInApp) getActivity().getApplication()).MyID();
-        Log.d("SYSTEM_ID", "Global Events: " + String.valueOf(System.identityHashCode(mEvents)));
     }
 
     @Override
@@ -83,8 +82,6 @@ public class EventListFragment extends FragmentTemplate {
 
     public void notifyDataSetChanged()
     {
-        Log.d(TAG,"data changed: " + mEvents.toString());
-        Log.d("SYSTEM_ID", "Notify Events: " + String.valueOf(System.identityHashCode(mEvents)));
         eventViewAdapter.refresh(myID,mEvents);
         eventViewAdapter.notifyDataSetChanged();
     }

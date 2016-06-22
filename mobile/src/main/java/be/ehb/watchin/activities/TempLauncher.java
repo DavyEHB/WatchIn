@@ -1,24 +1,11 @@
 package be.ehb.watchin.activities;
 
 import android.content.Intent;
-import android.nfc.Tag;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +13,13 @@ import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
-import be.ehb.watchin.model.dummy.DummyEventList;
+import be.ehb.watchin.services.AttendeeDAO.AttendeeRestService;
+import be.ehb.watchin.services.AttendeeDAO.AttendeeResultReceiver;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
-import be.ehb.watchin.services.EventDAO.EventRestService;
 import be.ehb.watchin.services.EventDAO.EventResultReceiver;
-import be.ehb.watchin.services.PersonDAO.PersonRestService;
-import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
-import be.ehb.watchin.services.SkillDAO.SkillRestService;
-import be.ehb.watchin.services.SkillDAO.SkillResultReceiver;
 
-public class TempLauncher extends AppCompatActivity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent {
+public class TempLauncher extends AppCompatActivity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
 
     private static final String TAG = "TempLauncher";
 
@@ -72,11 +55,8 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
     public void onClickGetByID(View view)
     {
 
-        Map<Integer,Event> integerEventMap = ((WatchInApp)getApplication()).Events;
-        Log.d(TAG,"Global Map: " +integerEventMap.toString());
-        Log.d("SYSTEM_ID", "Persons: " + String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Persons)));
-        Log.d("SYSTEM_ID", "Events: "+ String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Events)));
-
+        AttendeeResultReceiver attendeeResultReceiver = new AttendeeResultReceiver(this);
+        be.ehb.watchin.services.AttendeeDAO.AttendeeRestService.startActionGetAll(this,attendeeResultReceiver);
     }
 
 
@@ -139,6 +119,22 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
         Log.d(TAG,eventMap.toString());
     }
 
+
+    @Override
+    public void onReceiveAttendee(Bundle attendee) {
+        Log.d(TAG,"Receiving Attendee");
+        Log.d(TAG,attendee.toString());
+        int ID = attendee.getInt(AttendeeRestService.BUN_ID);
+        int PID = attendee.getInt(AttendeeRestService.BUN_PID);
+        int EID = attendee.getInt(AttendeeRestService.BUN_EID);
+
+        Person p = ((WatchInApp) getApplication()).Persons.get(PID);
+        Event e = ((WatchInApp) getApplication()).Events.get(EID);
+        p.Events().add(e);
+
+        Log.d(TAG,p.toString() +"Goes to: " +p.Events().toString());
+        Log.d(TAG,e.toString() + "Has guests: "+ e.Attendees().toString());
+    }
 
     @Override
     public void onError() {

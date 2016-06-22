@@ -20,8 +20,6 @@ import android.view.View;
 
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import be.ehb.watchin.R;
@@ -32,6 +30,8 @@ import be.ehb.watchin.fragments.PersonalDetail;
 import be.ehb.watchin.fragments.PersonsFragment.PersonListFragment;
 import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
+import be.ehb.watchin.services.AttendeeDAO.AttendeeRestService;
+import be.ehb.watchin.services.AttendeeDAO.AttendeeResultReceiver;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
 import be.ehb.watchin.services.EventDAO.EventRestService;
@@ -42,7 +42,7 @@ import be.ehb.watchin.services.SkillDAO.SkillRestService;
 import be.ehb.watchin.services.SkillDAO.SkillResultReceiver;
 
 public class WatchInMain extends AppCompatActivity implements PersonListFragment.OnListFragmentInteractionListener, PersonResultReceiver.ReceivePerson,
-        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent {
+        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
 
     private static final String TAG = "WatchinMain";
     /**
@@ -110,7 +110,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         */
 
         getPersons();
-        getEvents();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -155,12 +154,14 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     }
 
     public void onReceiveAllPersons(Map<Integer,Person> persons) {
-        Log.d(TAG,"Receiving All Persons");
         progressCount--;
+
         ((WatchInApp) getApplication()).Persons.clear();
         ((WatchInApp) getApplication()).Persons.putAll(persons);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
+
+        getEvents();
         getSkills();
         getContacts();
 
@@ -173,7 +174,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     @Override
     public void onReceive(int PID,String skill) {
         progressCount--;
-        Log.d(TAG,"Receiving skill");
         Person p = ((WatchInApp) getApplication()).Persons.get(PID);
         p.Skills().add(skill);
 
@@ -187,7 +187,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     @Override
     public void onReceiveContact(Bundle contact) {
         progressCount--;
-        Log.d(TAG,"Receiving contact");
         int ID = contact.getInt(ContactRestService.BUN_ID);
         int PID = contact.getInt(ContactRestService.BUN_PID);
         int CID = contact.getInt(ContactRestService.BUN_CID);
@@ -209,7 +208,6 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     }
 
     public void onReceiveAllEvents(Map<Integer, Event> eventMap) {
-        Log.d(TAG,"Receiving All Events");
         progressCount--;
 
         ((WatchInApp) getApplication()).Events.clear();
@@ -218,15 +216,36 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         ((EventListFragment) eventList).notifyDataSetChanged();
 
         Map<Integer,Event> integerEventMap = ((WatchInApp)getApplication()).Events;
-        Log.d(TAG,"Global Map: " +integerEventMap.toString());
 
-        Log.d("SYSTEM_ID", "Receive Events: "+String.valueOf(System.identityHashCode(((WatchInApp) getApplication()).Events)));
+        getAttendees();
 
         if (progressCount == 0) {
             progress.dismiss();
         }
     }
 
+
+    @Override
+    public void onReceiveAttendee(Bundle attendee) {
+      //  Log.d(TAG,"Receiving Attendee");
+      //  Log.d(TAG,attendee.toString());
+
+        progressCount--;
+
+        int ID = attendee.getInt(AttendeeRestService.BUN_ID);
+        int PID = attendee.getInt(AttendeeRestService.BUN_PID);
+        int EID = attendee.getInt(AttendeeRestService.BUN_EID);
+
+        Person p = ((WatchInApp) getApplication()).Persons.get(PID);
+        Event e = ((WatchInApp) getApplication()).Events.get(EID);
+        p.Events().add(e);
+
+        ((PersonListFragment) personList).notifyDataSetChanged();
+
+        if (progressCount == 0) {
+            progress.dismiss();
+        }
+    }
 
     @Override
     public void onError() {
@@ -238,19 +257,10 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         }
     }
 
-    private void getMeFromServer() {
-        int myID = ((WatchInApp) getApplication()).MyID();
-        PersonResultReceiver personResultReceiver = new PersonResultReceiver();
-        personResultReceiver.setPersonReceiver(this);
-        PersonRestService.startActionGetByID(this,myID,personResultReceiver);
-        progressCount++;
-    }
-
     private void getEvents()
     {
         Log.d(TAG,"Loading Events");
-        EventResultReceiver eventResultReceiver = new EventResultReceiver();
-        eventResultReceiver.setReceiver(this);
+        EventResultReceiver eventResultReceiver = new EventResultReceiver(this);
         EventRestService.startActionGetAll(this,eventResultReceiver);
         progressCount++;
     }
@@ -258,8 +268,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     private void getPersons()
     {
         Log.d(TAG,"Loading Persons");
-        PersonResultReceiver personResultReceiver = new PersonResultReceiver();
-        personResultReceiver.setPersonReceiver(this);
+        PersonResultReceiver personResultReceiver = new PersonResultReceiver(this);
         PersonRestService.startActionGetAll(this,personResultReceiver);
         progressCount++;
     }
@@ -276,10 +285,15 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     public void getContacts()
     {
         Log.d(TAG,"Loading contacts");
-        ContactResultReceiver contactResultReceiver = new ContactResultReceiver();
-        contactResultReceiver.setReceiver(this);
+        ContactResultReceiver contactResultReceiver = new ContactResultReceiver(this);
         ContactRestService.startActionGetAll(this,contactResultReceiver);
         progressCount++;
+    }
+
+    public void getAttendees()
+    {
+        AttendeeResultReceiver attendeeResultReceiver = new AttendeeResultReceiver(this);
+        be.ehb.watchin.services.AttendeeDAO.AttendeeRestService.startActionGetAll(this,attendeeResultReceiver);
     }
 
 

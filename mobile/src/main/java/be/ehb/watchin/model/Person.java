@@ -135,7 +135,23 @@ public class Person implements Serializable {
                 }
             }
         }
+        return mutual;
+    }
 
+    public List<Event> findMutualEvents(Person person)
+    {
+        List<Event> mutual = new ArrayList<>();
+        if (person != null){
+            for (Event mEvent : this.Events()) {
+                for (Event pEvent : person.Events()) {
+                    if (mEvent.getID() == pEvent.getID()) {
+                        if (!mutual.contains(mEvent)) {
+                            mutual.add(mEvent);
+                        }
+                    }
+                }
+            }
+        }
         return mutual;
     }
 

@@ -60,8 +60,7 @@ public class LoginActivity extends AppCompatActivity implements CheckEmailReceiv
             return;
         }
 
-        CheckEmailReceiver checkEmailReceiver = new CheckEmailReceiver();
-        checkEmailReceiver.setResultCallback(this);
+        CheckEmailReceiver checkEmailReceiver = new CheckEmailReceiver(this);
         checkEmailReceiver.checkEmail(this,email);
 
     }
@@ -75,9 +74,6 @@ public class LoginActivity extends AppCompatActivity implements CheckEmailReceiv
     @Override
     public void found(int id, String email) {
         progress.dismiss();
-        ((WatchInApp) this.getApplication()).MyID(id);
-        ((WatchInApp) this.getApplication()).MyEmail(email);
-        ((WatchInApp) this.getApplication()).Login();
 
         SharedPreferences settings = getSharedPreferences(WatchInMain.PREFS_NAME, 0);
         SharedPreferences.Editor edit = settings.edit();

@@ -25,13 +25,13 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
     private Map<Integer,Person> mPersons;
     private Integer[] mKeys;
     private final PersonListFragment.OnListFragmentInteractionListener mListener;
-    private int mID;
+    private Person me;
 
-    public PersonViewAdapter(int myID,Map<Integer,Person> persons, PersonListFragment.OnListFragmentInteractionListener listener) {
+    public PersonViewAdapter(Person Me,Map<Integer,Person> persons, PersonListFragment.OnListFragmentInteractionListener listener) {
          mListener = listener;
         mPersons = persons;
         mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
-        mID = myID;
+        this.me = Me;
     }
 
     @Override
@@ -47,14 +47,15 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
         holder.mPerson = mPersons.get(mKeys[position]);
         holder.txtFullName.setText(holder.mPerson.getFullname());
         holder.txtCompany.setText(holder.mPerson.getCompany());
-        if (mPersons.containsKey(mID)) {
-            Person me = mPersons.get(mID);
+        if (me!=null) {
             holder.txtMutualFriends.setText(String.valueOf(holder.mPerson.findMutualContacts(me).size()));
+            holder.txtMutualEvents.setText(String.valueOf(holder.mPerson.findMutualEvents(me).size()));
         } else
         {
             holder.txtMutualFriends.setText("0");
+            holder.txtMutualEvents.setText("0");
         }
-        holder.txtMutualEvents.setText("2");
+
         List<String> skillList = holder.mPerson.Skills();
         String skills = "";
         if (skillList.size()>0) {
@@ -111,9 +112,9 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
         }
     }
 
-    public void refresh(int myID,Map<Integer,Person> persons)
+    public void refresh(Person Me,Map<Integer,Person> persons)
     {
-        mID = myID;
+        this.me = Me;
         mPersons = persons;
         mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
     }
