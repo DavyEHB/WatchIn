@@ -12,7 +12,9 @@ import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -26,7 +28,7 @@ public class Event implements Serializable {
     private Date endTime;
     private String location;
     private UUID uuid;
-    private List<Person> attendees = new ArrayList<>();
+    private Map<Integer,Person> attendees = new HashMap<>();
 
     public int getID() {
         return ID;
@@ -77,10 +79,9 @@ public class Event implements Serializable {
     }
 
     public Event() {
-        attendees = new AttendeeList(this);
     }
 
-    public List<Person> Attendees() {
+    public Map<Integer,Person> Attendees() {
         return attendees;
     }
 

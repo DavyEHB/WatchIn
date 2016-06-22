@@ -30,7 +30,7 @@ public class AttendeeList extends ArrayList<Person> {
     public boolean add(Person person) {
         if ((!super.contains(person))&&(person != null)) {
             Boolean ret = super.add(person);
-            person.Events().add(event);
+            person.Events().put(event.getID(),event);
             return ret;
         }
         return false;
@@ -40,7 +40,7 @@ public class AttendeeList extends ArrayList<Person> {
     public void add(int index, Person person) {
         if ((!super.contains(person))&&(person != null)) {
             super.add(index, person);
-            person.Events().add(event);
+            person.Events().put(event.getID(),event);
         }
     }
 
@@ -48,7 +48,7 @@ public class AttendeeList extends ArrayList<Person> {
     public boolean remove(Object person) {
         if((super.contains(person))&&(person != null)){
             Boolean ret = super.remove(person);
-            ((Person) person).Events().remove(event);
+            ((Person) person).Events().remove(event.getID());
             return ret;
         }
         return false;
@@ -59,7 +59,7 @@ public class AttendeeList extends ArrayList<Person> {
         Person person = super.get(index);
         if(super.contains(person)){
             Person ret = super.remove(index);
-            person.Events().remove(event);
+            person.Events().remove(event.getID());
             return ret;
         }
         return person;

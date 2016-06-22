@@ -104,7 +104,7 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
         */
         Person p = ((WatchInApp) getApplication()).Persons.get(PID);
         Person c = ((WatchInApp) getApplication()).Persons.get(CID);
-        p.Contacts().add(c);
+        p.Contacts().put(c.getID(),c);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
         Person p = ((WatchInApp) getApplication()).Persons.get(PID);
         Event e = ((WatchInApp) getApplication()).Events.get(EID);
-        p.Events().add(e);
+        p.Events().put(e.getID(),e);
 
         Log.d(TAG,p.toString() +"Goes to: " +p.Events().toString());
         Log.d(TAG,e.toString() + "Has guests: "+ e.Attendees().toString());
@@ -146,14 +146,14 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
         Log.d(TAG,"===BTN 2 Click ===");
 
         Map<Integer,Person> personList =((WatchInApp) getApplication()).Persons;
-        List<Person> mutual = null;
+        Map<Integer,Person> mutual = null;
         Person me = ((WatchInApp) getApplication()).Me();
 
         Log.d(TAG,me.toString());
 
         Log.d(TAG,"--== friend list ==--");
 
-        for(Person c: me.Contacts())
+        for(Person c: me.Contacts().values())
         {
             mutual = c.findMutualContacts(me);
             Log.d(TAG,c.toString() + " #mutual: " + mutual.size());

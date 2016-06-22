@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import be.ehb.watchin.builders.PersonBuilder;
 
@@ -22,13 +24,12 @@ public class Person implements Serializable {
     private String beaconID = "";
     private Bitmap photo;
     private List<String> skills = new ArrayList<>();
-    private List<Event> events;
-    private List<Person> contacts = new ArrayList<>();
-    private List<Person> meetings = new ArrayList<>();
+    private Map<Integer,Event> events = new HashMap<>();
+    private Map<Integer,Person> contacts = new HashMap<>();
+    private Map<Integer,Person> meetings = new HashMap<>();
     private int ID;
 
     public Person() {
-        events = new EventList(this);
     }
 
     public String getFirstName() {
@@ -91,15 +92,15 @@ public class Person implements Serializable {
         return skills;
     }
 
-    public List<Person> Contacts() {
+    public Map<Integer,Person> Contacts() {
         return contacts;
     }
 
-    public List<Event> Events() {
+    public Map<Integer,Event> Events() {
         return events;
     }
 
-    public List<Person> Meetings() {
+    public Map<Integer,Person> Meetings() {
         return meetings;
     }
 
@@ -121,15 +122,15 @@ public class Person implements Serializable {
         return new PersonBuilder();
     }
 
-    public List<Person> findMutualContacts(Person person)
+    public Map<Integer,Person> findMutualContacts(Person person)
     {
-        List<Person> mutual = new ArrayList<>();
+        Map<Integer,Person> mutual = new HashMap<>();
         if (person != null){
-            for (Person mC : this.Contacts()) {
-                for (Person pC : person.Contacts()) {
+            for (Person mC : this.Contacts().values()) {
+                for (Person pC : person.Contacts().values()) {
                     if (mC.getID() == pC.getID()) {
-                        if (!mutual.contains(mC)) {
-                            mutual.add(mC);
+                        if (!mutual.containsValue(mC)) {
+                            mutual.put(mC.getID(),mC);
                         }
                     }
                 }
@@ -138,15 +139,15 @@ public class Person implements Serializable {
         return mutual;
     }
 
-    public List<Event> findMutualEvents(Person person)
+    public Map<Integer,Event> findMutualEvents(Person person)
     {
-        List<Event> mutual = new ArrayList<>();
+        Map<Integer,Event> mutual = new HashMap<>();
         if (person != null){
-            for (Event mEvent : this.Events()) {
-                for (Event pEvent : person.Events()) {
+            for (Event mEvent : this.Events().values()) {
+                for (Event pEvent : person.Events().values()) {
                     if (mEvent.getID() == pEvent.getID()) {
-                        if (!mutual.contains(mEvent)) {
-                            mutual.add(mEvent);
+                        if (!mutual.containsValue(mEvent)) {
+                            mutual.put(mEvent.getID(),mEvent);
                         }
                     }
                 }

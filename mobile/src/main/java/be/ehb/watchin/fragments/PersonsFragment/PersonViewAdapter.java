@@ -43,7 +43,7 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-
+        mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
         holder.mPerson = mPersons.get(mKeys[position]);
         holder.txtFullName.setText(holder.mPerson.getFullname());
         holder.txtCompany.setText(holder.mPerson.getCompany());

@@ -59,6 +59,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
 
     private FragmentTemplate personList = PersonListFragment.newInstance();
     private FragmentTemplate eventList = EventListFragment.newInstance();
+    private FragmentTemplate personalDetail = PersonalDetail.newInstance("Me");
 
     public static final String PREFS_NAME = "WatchInPrefs";
     public static final String PREFS_ID = "UserID";
@@ -193,7 +194,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
 
         Person p = ((WatchInApp) getApplication()).Persons.get(PID);
         Person c = ((WatchInApp) getApplication()).Persons.get(CID);
-        p.Contacts().add(c);
+        p.Contacts().put(c.getID(),c);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
 
@@ -238,9 +239,12 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
 
         Person p = ((WatchInApp) getApplication()).Persons.get(PID);
         Event e = ((WatchInApp) getApplication()).Events.get(EID);
-        p.Events().add(e);
+        p.Events().put(e.getID(),e);
+        e.Attendees().put(p.getID(),p);
 
         ((PersonListFragment) personList).notifyDataSetChanged();
+
+        ((PersonalDetail) personalDetail).notifyDataChange(((WatchInApp) getApplication()).Me());
 
         if (progressCount == 0) {
             progress.dismiss();
@@ -372,7 +376,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
-        private FragmentTemplate personalDetail = PersonalDetail.newInstance("Me");
+
 
         @Override
         public FragmentTemplate getItem(int position) {

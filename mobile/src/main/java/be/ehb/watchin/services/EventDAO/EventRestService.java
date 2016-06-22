@@ -35,6 +35,7 @@ import java.util.UUID;
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.builders.EventBuilder;
 import be.ehb.watchin.model.Event;
+import be.ehb.watchin.model.Person;
 
 /**
  * Created by davy.van.belle on 14/06/2016.
@@ -101,7 +102,6 @@ public class EventRestService extends IntentService {
     }
 
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -163,6 +163,7 @@ public class EventRestService extends IntentService {
 
         addToQueue(jsonRequest);
     }
+
 
     private void addToQueue(JsonRequest request)
     {
