@@ -59,7 +59,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
 
     private FragmentTemplate personList = PersonListFragment.newInstance();
     private FragmentTemplate eventList = EventListFragment.newInstance();
-    private FragmentTemplate personalDetail = PersonalDetail.newInstance("Me");
+    private FragmentTemplate personalDetail;
 
     public static final String PREFS_NAME = "WatchInPrefs";
     public static final String PREFS_ID = "UserID";
@@ -90,6 +90,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
             ((WatchInApp) getApplication()).MyID(userID);
             ((WatchInApp) getApplication()).MyEmail(email);
             ((WatchInApp) getApplication()).Login();
+            personalDetail = PersonalDetail.newInstance(userID,"Me");
         }
 
         super.onCreate(savedInstanceState);
@@ -345,7 +346,9 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
 
     @Override
     public void onListFragmentInteraction(Person item) {
-
+        Intent intent = new Intent(this,PersonDetailActivity.class);
+        intent.putExtra(PersonDetailActivity.USER_ID,item.getID());
+        startActivity(intent);
     }
 
     public void onAddEventClick(View view) {

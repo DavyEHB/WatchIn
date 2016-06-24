@@ -1,7 +1,5 @@
 package be.ehb.watchin.fragments;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,9 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -27,11 +22,8 @@ import java.util.Map;
 
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
-import be.ehb.watchin.fragments.EventFragment.EventViewAdapter;
 import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
-import be.ehb.watchin.services.PersonDAO.PersonRestService;
-import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,12 +36,11 @@ import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 public class PersonalDetail extends FragmentTemplate {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_TITLE = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private static final String TAG = "FragmentPersonalDetail";
+    private static final String ARG_TITLE = "Title";
+    private static final String ARG_USERID = "userID";
+    private static final String TAG = "PersonalDetail";
 
-    private String title;
-    private String mParam2;
+    private int userID;
 
     private OnFragmentInteractionListener mListener;
 
@@ -64,28 +55,33 @@ public class PersonalDetail extends FragmentTemplate {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *     * @param title Parameter 1.
-     * @return A new instance of fragment PersonalDetailActivity.
+     * @return A new instance of fragment PersonDetailActivity.
      */
     // TODO: Rename and change types and number of parameters
-    public static PersonalDetail newInstance(String title) {
+    public static PersonalDetail newInstance(int userID, String title) {
         PersonalDetail fragment = new PersonalDetail();
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
+        args.putInt(ARG_USERID,userID);
+        args.putString(ARG_TITLE,title);
         fragment.setArguments(args);
         fragment.mTitle = title;
+        fragment.userID = userID;
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            userID = getArguments().getInt(ARG_USERID);
+            me = ((WatchInApp) getActivity().getApplication()).Persons.get(userID);
             mTitle = getArguments().getString(ARG_TITLE);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            Log.d(TAG,"onCreate Args: " + userID);
         }
-        int myID = ((WatchInApp) getActivity().getApplication()).MyID();
-        me = ((WatchInApp) getActivity().getApplication()).Me();
-        //me = ((WatchInApp) getActivity().getApplication()).Persons.get(myID);
+        //int myID = ((WatchInApp) getActivity().getApplication()).MyID();
+        me = ((WatchInApp) getActivity().getApplication()).Persons.get(userID);
+        eventAdapter.notifyDataSetChanged();
     }
 
 
@@ -112,6 +108,7 @@ public class PersonalDetail extends FragmentTemplate {
             if (lvEvents != null) {
                 Context context = lvEvents.getContext();
                 lvEvents.setLayoutManager(new LinearLayoutManager(context));
+                eventAdapter.refresh(me,me.Events());
                 lvEvents.setAdapter(eventAdapter);
             }
 
@@ -146,15 +143,14 @@ public class PersonalDetail extends FragmentTemplate {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(View uri);
     }
 
     public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
         private static final String TAG = "EventAdapter";
-         private Integer[] mKeys;
-        private final PersonalDetail.OnFragmentInteractionListener mListener;
+        private Integer[] mKeys;
+        //private final PersonalDetail.OnFragmentInteractionListener mListener;
         private Person me;
 
         public EventAdapter(Person Me,PersonalDetail.OnFragmentInteractionListener listener) {

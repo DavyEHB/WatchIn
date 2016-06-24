@@ -37,7 +37,7 @@ public class PersonListFragment extends FragmentTemplate {
     private Map<Integer,Person> mPersons = new HashMap<>();
     private Person me;
 
-    private PersonViewAdapter personViewAdapter = new PersonViewAdapter(me,mPersons, mListener);
+    private PersonViewAdapter personViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -95,6 +95,8 @@ public class PersonListFragment extends FragmentTemplate {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
+            Log.d(TAG, "System hash: " + System.identityHashCode(mListener));
+            personViewAdapter = new PersonViewAdapter(me,mPersons, mListener);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnPersonListFragmentInteractionListener");

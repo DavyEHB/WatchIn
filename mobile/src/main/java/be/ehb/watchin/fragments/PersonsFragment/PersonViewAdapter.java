@@ -1,7 +1,5 @@
 package be.ehb.watchin.fragments.PersonsFragment;
 
-import android.app.Application;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 
 import android.util.Log;
@@ -12,7 +10,6 @@ import android.widget.TextView;
 
 
 import be.ehb.watchin.R;
-import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.model.Person;
 
 import java.util.List;
@@ -28,7 +25,7 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
     private Person me;
 
     public PersonViewAdapter(Person Me,Map<Integer,Person> persons, PersonListFragment.OnListFragmentInteractionListener listener) {
-         mListener = listener;
+        mListener = listener;
         mPersons = persons;
         mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
         this.me = Me;
@@ -73,9 +70,10 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
+                    Log.d(TAG,"OnClick Item");
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    //mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(holder.mPerson);
                 }
             }
         });

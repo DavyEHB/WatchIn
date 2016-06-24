@@ -54,9 +54,9 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
     public void onClickGetByID(View view)
     {
-
-        AttendeeResultReceiver attendeeResultReceiver = new AttendeeResultReceiver(this);
-        be.ehb.watchin.services.AttendeeDAO.AttendeeRestService.startActionGetAll(this,attendeeResultReceiver);
+        Intent intent = new Intent(this,PersonDetailActivity.class);
+        intent.putExtra(PersonDetailActivity.USER_ID,2);
+        startActivity(intent);
     }
 
 
