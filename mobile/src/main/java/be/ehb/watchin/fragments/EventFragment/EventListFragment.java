@@ -9,17 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.fragments.FragmentTemplate;
 import be.ehb.watchin.model.Event;
-import be.ehb.watchin.model.Person;
-import be.ehb.watchin.model.dummy.DummyEventList;
 
 
 public class EventListFragment extends FragmentTemplate {
@@ -29,14 +25,16 @@ public class EventListFragment extends FragmentTemplate {
     private Map<Integer,Event> mEvents = new HashMap<>();
     private static final String title = "Events";
 
-    private OnListFragmentInteractionListener mListener;
+    private OnEventListInteractionListener mListener;
     private int myID = 0;
 
-    private EventViewAdapter eventViewAdapter = new EventViewAdapter(myID,mEvents, mListener);
+    private EventViewAdapter eventViewAdapter;
 
-    /**
-     * fragment (e.g. upon screen orientation changes).
-     */
+    public interface OnEventListInteractionListener {
+        // TODO: Update argument type and name
+        void onEventListClick(Event event);
+    }
+
     public EventListFragment() {
     }
 
@@ -61,6 +59,19 @@ public class EventListFragment extends FragmentTemplate {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnEventListInteractionListener) {
+            mListener = (OnEventListInteractionListener) context;
+            Log.d(TAG, "System hash: " + System.identityHashCode(mListener));
+            eventViewAdapter = new EventViewAdapter(myID,mEvents, mListener);
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnEventListFragmentInteractionListener");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
@@ -73,11 +84,6 @@ public class EventListFragment extends FragmentTemplate {
             recyclerView.setAdapter(eventViewAdapter);
         }
         return view;
-    }
-
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(Person item);
     }
 
     public void notifyDataSetChanged()

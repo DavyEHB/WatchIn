@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import java.util.Map;
 
+import be.ehb.watchin.EventDetailActivity;
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.fragments.EventFragment.EventListFragment;
@@ -41,8 +42,8 @@ import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 import be.ehb.watchin.services.SkillDAO.SkillRestService;
 import be.ehb.watchin.services.SkillDAO.SkillResultReceiver;
 
-public class WatchInMain extends AppCompatActivity implements PersonListFragment.OnListFragmentInteractionListener, PersonResultReceiver.ReceivePerson,
-        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
+public class WatchInMain extends AppCompatActivity implements EventListFragment.OnEventListInteractionListener, PersonListFragment.OnPersonListInteractionListener, PersonResultReceiver.ReceivePerson,
+        SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee, PersonalDetail.OnPersonDetailInteractionListener {
 
     private static final String TAG = "WatchinMain";
     /**
@@ -345,7 +346,7 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
     }
 
     @Override
-    public void onListFragmentInteraction(Person item) {
+    public void onPersonListClick(Person item) {
         Intent intent = new Intent(this,PersonDetailActivity.class);
         intent.putExtra(PersonDetailActivity.USER_ID,item.getID());
         startActivity(intent);
@@ -367,6 +368,13 @@ public class WatchInMain extends AppCompatActivity implements PersonListFragment
                 .create();
         ((WatchInApp)getApplication()).Persons.put(p2.getID(),p2);
         ((PersonListFragment) personList).notifyDataSetChanged();
+    }
+
+    @Override
+    public void onEventListClick(Event event) {
+        Intent intent = new Intent(this,EventDetailActivity.class);
+        intent.putExtra(EventDetailActivity.EVENT_ID,event.getID());
+        startActivity(intent);
     }
 
 

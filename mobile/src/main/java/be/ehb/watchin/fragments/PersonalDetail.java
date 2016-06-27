@@ -28,7 +28,7 @@ import be.ehb.watchin.model.Person;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PersonalDetail.OnFragmentInteractionListener} interface
+ * {@link OnPersonDetailInteractionListener} interface
  * to handle interaction events.
  * Use the {@link PersonalDetail#newInstance} factory method to
  * create an instance of this fragment.
@@ -42,7 +42,7 @@ public class PersonalDetail extends FragmentTemplate {
 
     private int userID;
 
-    private OnFragmentInteractionListener mListener;
+    private OnPersonDetailInteractionListener mListener;
 
     private Person me = new Person();
     private EventAdapter eventAdapter = new EventAdapter(me, mListener);
@@ -117,6 +117,18 @@ public class PersonalDetail extends FragmentTemplate {
         return view;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnPersonDetailInteractionListener) {
+            mListener = (OnPersonDetailInteractionListener) context;
+            eventAdapter = new EventAdapter(me,mListener);
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnPersonDetailInteractionListener");
+        }
+    }
+
 
     @Override
     public void onDetach() {
@@ -142,18 +154,18 @@ public class PersonalDetail extends FragmentTemplate {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(View uri);
+    public interface OnPersonDetailInteractionListener {
+        void onEventListClick(Event event);
     }
 
     public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
         private static final String TAG = "EventAdapter";
         private Integer[] mKeys;
-        //private final PersonalDetail.OnFragmentInteractionListener mListener;
+        //private final PersonalDetail.OnPersonDetailInteractionListener mListener;
         private Person me;
 
-        public EventAdapter(Person Me,PersonalDetail.OnFragmentInteractionListener listener) {
+        public EventAdapter(Person Me,OnPersonDetailInteractionListener listener) {
             super();
             this.me = Me;
             mKeys = me.Events().keySet().toArray(new Integer[me.Events().size()]);
@@ -171,18 +183,29 @@ public class PersonalDetail extends FragmentTemplate {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = me.Events().get(mKeys[position]);
-            holder.mEventName.setText(holder.mItem.getName());
-            Date date = holder.mItem.getStartTime();
+            holder.mEvent = me.Events().get(mKeys[position]);
+            holder.mEventName.setText(holder.mEvent.getName());
+            Date date = holder.mEvent.getStartTime();
             if (date != null) {
                 SimpleDateFormat ft =
                         new SimpleDateFormat("dd MMMM yy");
 
                 holder.mDate.setText(ft.format(date));
             }
-            holder.mAttendees.setText(String.valueOf(holder.mItem.Attendees().size()));
-            holder.mLocation.setText(holder.mItem.getLocation());
+            holder.mAttendees.setText(String.valueOf(holder.mEvent.Attendees().size()));
+            holder.mLocation.setText(holder.mEvent.getLocation());
 
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (null != mListener) {
+                        Log.d(TAG,"OnClick Item");
+                        // Notify the active callbacks interface (the activity, if the
+                        // fragment is attached to one) that an item has been selected.
+                        mListener.onEventListClick(holder.mEvent);
+                    }
+                }
+            });
         }
 
         public Map<Integer, Event> sortByValue(Map<Integer, Event> map) {
@@ -218,7 +241,7 @@ public class PersonalDetail extends FragmentTemplate {
             public final TextView mDate;
             public final TextView mLocation;
             public final TextView mAttendees;
-            public Event mItem;
+            public Event mEvent;
 
             public ViewHolder(View view) {
                 super(view);

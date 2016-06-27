@@ -21,10 +21,10 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
     private static final String TAG = "PersonViewAdapter";
     private Map<Integer,Person> mPersons;
     private Integer[] mKeys;
-    private final PersonListFragment.OnListFragmentInteractionListener mListener;
+    private final PersonListFragment.OnPersonListInteractionListener mListener;
     private Person me;
 
-    public PersonViewAdapter(Person Me,Map<Integer,Person> persons, PersonListFragment.OnListFragmentInteractionListener listener) {
+    public PersonViewAdapter(Person Me,Map<Integer,Person> persons, PersonListFragment.OnPersonListInteractionListener listener) {
         mListener = listener;
         mPersons = persons;
         mKeys = mPersons.keySet().toArray(new Integer[mPersons.size()]);
@@ -73,7 +73,7 @@ public class PersonViewAdapter extends RecyclerView.Adapter<PersonViewAdapter.Vi
                     Log.d(TAG,"OnClick Item");
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mPerson);
+                    mListener.onPersonListClick(holder.mPerson);
                 }
             }
         });

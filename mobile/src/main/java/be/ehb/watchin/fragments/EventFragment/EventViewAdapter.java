@@ -1,7 +1,6 @@
 package be.ehb.watchin.fragments.EventFragment;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import be.ehb.watchin.R;
 import be.ehb.watchin.model.Event;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -25,10 +23,10 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
     private static final String TAG = "EventViewAdapter";
     private Map<Integer,Event> mEvents=null;
     private Integer[] mKeys;
-    private final EventListFragment.OnListFragmentInteractionListener mListener;
+    private final EventListFragment.OnEventListInteractionListener mListener;
     private int mID;
 
-    public EventViewAdapter(int myID, Map<Integer,Event> events, EventListFragment.OnListFragmentInteractionListener listener) {
+    public EventViewAdapter(int myID, Map<Integer,Event> events, EventListFragment.OnEventListInteractionListener listener) {
         mID= myID;
         mEvents =  events;
         mKeys = mEvents.keySet().toArray(new Integer[mEvents.size()]);
@@ -44,17 +42,28 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mEvents.get(mKeys[position]);
-        holder.mEventName.setText(holder.mItem.getName());
-        Date date = holder.mItem.getStartTime();
+        holder.mEvent = mEvents.get(mKeys[position]);
+        holder.mEventName.setText(holder.mEvent.getName());
+        Date date = holder.mEvent.getStartTime();
         if (date != null){
             SimpleDateFormat ft =
                     new SimpleDateFormat("dd MMMM yy");
 
             holder.mDate.setText(ft.format(date));
         }
-        holder.mAttendees.setText(String.valueOf(holder.mItem.Attendees().size()));
-        holder.mLocation.setText(holder.mItem.getLocation());
+        holder.mAttendees.setText(String.valueOf(holder.mEvent.Attendees().size()));
+        holder.mLocation.setText(holder.mEvent.getLocation());
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onEventListClick(holder.mEvent);
+                }
+            }
+        });
 
     }
 
@@ -96,7 +105,7 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
         public final TextView mDate;
         public final TextView mLocation;
         public final TextView mAttendees;
-        public Event mItem;
+        public Event mEvent;
 
         public ViewHolder(View view) {
             super(view);
