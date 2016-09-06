@@ -31,17 +31,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Button 1"
-        android:id="@+id/btnCheckMail"
+        android:id="@+id/btnTemp1"
         android:layout_below="@+id/btnSwipe"
         android:layout_centerHorizontal="true"
-        android:onClick="onClickGetByID"/>
+        android:onClick="onClickBtn1"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Count Contacts"
+        android:text="Button 2"
         android:id="@+id/btnTemp2"
-        android:layout_below="@+id/btnCheckMail"
+        android:layout_below="@+id/btnTemp1"
         android:layout_centerHorizontal="true"
         android:onClick="onClickBtn2"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/tv1"
+        android:layout_below="@+id/btn3"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button 3"
+        android:id="@+id/btn3"
+        android:layout_below="@+id/btnTemp2"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickBtn3"/>
 </RelativeLayout>

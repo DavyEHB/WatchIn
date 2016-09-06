@@ -37,7 +37,7 @@ public class AttendeeResultReceiver extends ResultReceiver{
 
     public interface ReceiveAttendee {
 
-        void onReceiveAttendee(Bundle contact);
+        void onReceiveAttendee(Bundle attendee);
         void onError();
 
     }

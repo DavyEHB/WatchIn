@@ -3,6 +3,8 @@
     package="be.ehb.watchin" >
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -17,7 +19,8 @@
         <activity
             android:name=".activities.WatchInMain"
             android:label="@string/title_activity_watch_in_main"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
 
             <!--
             <intent-filter>
@@ -27,15 +30,27 @@
             </intent-filter>
             -->
         </activity>
-        <activity android:name=".activities.TempLauncher" >
+
+        <activity android:name=".activities.TempLauncher"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.RegisterActivity" />
+
+        <activity android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".activities.RegisterActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".activities.PersonDetailActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".activities.EventDetailActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".services.PersonDAO.PersonRestService"
@@ -51,11 +66,10 @@
             android:exported="false" />
         <service
             android:name=".services.AttendeeDAO.AttendeeRestService"
+            android:exported="false"/>
+        <service
+            android:name=".services.BeaconScannerService"
             android:exported="false" />
-
-        <activity android:name=".activities.PersonDetailActivity" />
-        <activity android:name=".EventDetailActivity" >
-        </activity>
     </application>
 
 </manifest>

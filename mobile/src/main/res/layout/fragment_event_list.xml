@@ -12,4 +12,5 @@
     tools:context=".fragments.EventFragment.EventListFragment"
     tools:listitem="@layout/fragment_event"
     android:onClick="onListEventItemClick"
-    android:paddingTop="10dp" />
+    android:paddingTop="10dp"
+    android:paddingLeft="10dp" />

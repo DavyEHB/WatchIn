@@ -2,9 +2,12 @@ package be.ehb.watchin.activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.bluetooth.le.ScanResult;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,11 +21,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Map;
 
-import be.ehb.watchin.EventDetailActivity;
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
 import be.ehb.watchin.fragments.EventFragment.EventListFragment;
@@ -33,6 +36,7 @@ import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
 import be.ehb.watchin.services.AttendeeDAO.AttendeeRestService;
 import be.ehb.watchin.services.AttendeeDAO.AttendeeResultReceiver;
+import be.ehb.watchin.services.BeaconScannerService;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
 import be.ehb.watchin.services.EventDAO.EventRestService;
@@ -66,6 +70,8 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
     public static final String PREFS_ID = "UserID";
     public static final String PREFS_EMAIL = "Email";
     public static final String PREFS_LOGIN = "Login";
+
+    private boolean isScanning = false;
 
 
 
@@ -230,8 +236,8 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
 
     @Override
     public void onReceiveAttendee(Bundle attendee) {
-      //  Log.d(TAG,"Receiving Attendee");
-      //  Log.d(TAG,attendee.toString());
+        Log.d(TAG,"Receiving Attendee");
+        Log.d(TAG,attendee.toString());
 
         progressCount--;
 
@@ -263,7 +269,7 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
         }
     }
 
-    private void getEvents()
+    public void getEvents()
     {
         Log.d(TAG,"Loading Events");
         EventResultReceiver eventResultReceiver = new EventResultReceiver(this);
@@ -271,7 +277,7 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
         progressCount++;
     }
 
-    private void getPersons()
+    public void getPersons()
     {
         Log.d(TAG,"Loading Persons");
         PersonResultReceiver personResultReceiver = new PersonResultReceiver(this);
@@ -308,7 +314,9 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_watchin_main, menu);
-        return true;
+        MenuItem miScanning = menu.findItem(R.id.action_scanning);
+        miScanning.setChecked(isScanning);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -334,6 +342,28 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
             });
             AlertDialog dialog = builder.create();
             dialog.show();
+            return true;
+        }
+        else if (id == R.id.action_scanning) {
+            isScanning = !item.isChecked();
+            item.setChecked(isScanning);
+            if (isScanning) {
+                ResultReceiver rec = new ResultReceiver(new Handler())
+                {
+                    @Override
+                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                        super.onReceiveResult(resultCode, resultData);
+                        int RSSI = ((ScanResult) resultData.getParcelable("Device")).getRssi();
+                        Log.d(TAG, "onReceiveResult: " + resultCode);
+                        Log.d(TAG, "onReceiveResult: " + RSSI);
+                    }
+                };
+                BeaconScannerService.startScanning(this,rec);
+            }
+            else
+            {
+                BeaconScannerService.stopScanning(this);
+            }
             return true;
         }
 
@@ -375,6 +405,29 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
         Intent intent = new Intent(this,EventDetailActivity.class);
         intent.putExtra(EventDetailActivity.EVENT_ID,event.getID());
         startActivity(intent);
+    }
+
+    public void onVisibleClick(View view) {
+        Person me = ((WatchInApp) getApplication()).Me();
+        me.setVisible(!me.isVisible());
+        Log.d(TAG, "onVisibleClick: " + me.isVisible());
+        PersonResultReceiver personResultReceiver = new PersonResultReceiver(new PersonResultReceiver.ReceivePerson() {
+            @Override
+            public void onReceive(Person person) {
+
+            }
+
+            @Override
+            public void onReceiveAllPersons(Map<Integer, Person> persons) {
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+        PersonRestService.startActionUpdate(this,me,personResultReceiver);
     }
 
 

@@ -26,6 +26,8 @@ public class EventViewAdapter extends RecyclerView.Adapter<EventViewAdapter.View
     private final EventListFragment.OnEventListInteractionListener mListener;
     private int mID;
 
+
+
     public EventViewAdapter(int myID, Map<Integer,Event> events, EventListFragment.OnEventListInteractionListener listener) {
         mID= myID;
         mEvents =  events;

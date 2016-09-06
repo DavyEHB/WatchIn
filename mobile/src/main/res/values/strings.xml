@@ -22,4 +22,9 @@
     </string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="ble_not_supported">Device not BLE compatible</string>
+    <string name="action_start_scan">Scan</string>
+    <string name="action_stop_scan">Stop</string>
+    <string name="scanning">Scanning</string>
+
 </resources>

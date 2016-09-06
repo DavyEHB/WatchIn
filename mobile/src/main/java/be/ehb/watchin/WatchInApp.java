@@ -19,7 +19,7 @@ public class WatchInApp extends Application {
     public final Map<Integer,Person> Persons = new HashMap<>();
     public final Map<Integer,Event> Events = new HashMap<>();
 
-    public static String server = "192.168.56.1:8080";
+    public static String server = "dt-note-davyvb:8080";
 
 
     public static class path{

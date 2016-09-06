@@ -35,12 +35,12 @@ import be.ehb.watchin.WatchInApp;
  */
 public class ContactRestService extends IntentService{
 
-    private static final String ACTION_GETBYID = "be.ehb.restclient.services.action.GET";
-    private static final String ACTION_GETALL = "be.ehb.restclient.services.action.GETALL";
-    private static final String ACTION_CREATE = "be.ehb.restclient.services.action.CREATE";
+    private static final String ACTION_GETBYID = "be.ehb.watchin.services.action.GET";
+    private static final String ACTION_GETALL = "be.ehb.watchin.services.action.GETALL";
+    private static final String ACTION_CREATE = "be.ehb.watchin.services.action.CREATE";
 
-    private static final String EXTRA_ID = "be.ehb.restclient.services.extra.ID";
-    private static final String EXTRA_RECEIVER = "be.ehb.restclient.services.extra.RECEIVER";
+    private static final String EXTRA_ID = "be.ehb.watchin.services.extra.ID";
+    private static final String EXTRA_RECEIVER = "be.ehb.watchin.services.extra.RECEIVER";
 
     private static final String TAG = "ContactRestService";
     private static final int MY_SOCKET_TIMEOUT_MS = 5000;

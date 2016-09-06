@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -97,6 +99,7 @@ public class PersonalDetail extends FragmentTemplate {
             TextView txtCompany = (TextView) view.findViewById(R.id.txtCompany);
             TextView txtEmail = (TextView) view.findViewById(R.id.txtEmail);
             TextView txtContacts = (TextView) view.findViewById(R.id.txtContacts);
+            Switch swVisible = (Switch) view.findViewById(R.id.swVisible);
 
             RecyclerView lvEvents = (RecyclerView) view.findViewById(R.id.lvMyEvents);
 
@@ -104,6 +107,8 @@ public class PersonalDetail extends FragmentTemplate {
             txtEmail.setText(me.getEmail());
             txtCompany.setText(me.getCompany());
             txtContacts.setText(String.valueOf(me.Contacts().size()));
+
+            swVisible.setChecked(me.isVisible());
 
             if (lvEvents != null) {
                 Context context = lvEvents.getContext();

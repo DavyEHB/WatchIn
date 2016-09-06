@@ -1,11 +1,33 @@
 package be.ehb.watchin.activities;
 
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,19 +37,32 @@ import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
 import be.ehb.watchin.services.AttendeeDAO.AttendeeRestService;
 import be.ehb.watchin.services.AttendeeDAO.AttendeeResultReceiver;
+import be.ehb.watchin.services.BeaconScannerService;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
 import be.ehb.watchin.services.EventDAO.EventResultReceiver;
+import be.ehb.watchin.services.PersonDAO.PersonRestService;
+import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
 
-public class TempLauncher extends AppCompatActivity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
+public class TempLauncher extends Activity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
 
     private static final String TAG = "TempLauncher";
+
+    private TextView tv1;
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tv1 = (TextView) findViewById(R.id.tv1);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temp_launcher);
-    }
+        tv1 = (TextView) findViewById(R.id.tv1);
+     }
 
     public void onClickSwipe(View view)
     {
@@ -50,6 +85,7 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
                 .firstName("Davy")
                 .create();
         Log.d(TAG,p.toString());
+
     }
 
     public void onClickGetByID(View view)
@@ -141,29 +177,50 @@ public class TempLauncher extends AppCompatActivity implements ContactResultRece
 
     }
 
+
     public void onClickBtn2(View view) {
-
-        Log.d(TAG,"===BTN 2 Click ===");
-
-        Map<Integer,Person> personList =((WatchInApp) getApplication()).Persons;
-        Map<Integer,Person> mutual = null;
-        Person me = ((WatchInApp) getApplication()).Me();
-
-        Log.d(TAG,me.toString());
-
-        Log.d(TAG,"--== friend list ==--");
-
-        for(Person c: me.Contacts().values())
+        ResultReceiver rec = new ResultReceiver(new Handler())
         {
-            mutual = c.findMutualContacts(me);
-            Log.d(TAG,c.toString() + " #mutual: " + mutual.size());
-        }
-
-        Log.d(TAG,"--== No friend list ==--");
-
-        for (Person p : personList.values()) {
-            mutual = p.findMutualContacts(me);
-            Log.d(TAG, p.toString() + " #mutual: " + mutual.size());
-        }
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                super.onReceiveResult(resultCode, resultData);
+                int RSSI = ((ScanResult) resultData.getParcelable("Device")).getRssi();
+                Log.d(TAG, "onReceiveResult: " + resultCode);
+                Log.d(TAG, "onReceiveResult: " + RSSI);
+                TextView tv1 = (TextView) findViewById(R.id.tv1);
+                tv1.setText(String.valueOf(RSSI));
+            }
+        };
+        BeaconScannerService.startScanning(this,rec);
     }
+
+    public void onClickBtn1(View view) {
+        BeaconScannerService.stopScanning(this);
+    }
+
+
+    public void onClickBtn3(View view) {
+        Log.d(TAG, "btn3 Clicked");
+
+
+
+
+
+    }
+
+
+    /*DAO Call to log in to venue
+    AttendeeResultReceiver attendeeResultReceiver = new AttendeeResultReceiver(new AttendeeResultReceiver.ReceiveAttendee() {
+        @Override
+        public void onReceiveAttendee(Bundle attendee) {
+            Log.d(TAG, "onReceiveAttendee: ");
+        }
+
+        @Override
+        public void onError() {
+
+        }
+    });
+    AttendeeRestService.startActionUpdate(this,4,1,false,attendeeResultReceiver);
+    */
 }

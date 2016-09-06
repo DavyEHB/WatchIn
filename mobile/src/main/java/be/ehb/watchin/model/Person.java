@@ -28,6 +28,7 @@ public class Person implements Serializable {
     private Map<Integer,Person> contacts = new HashMap<>();
     private Map<Integer,Person> meetings = new HashMap<>();
     private int ID;
+    private Boolean visible;
 
     public Person() {
     }
@@ -115,6 +116,16 @@ public class Person implements Serializable {
     public String getFullname()
     {
         return firstName + " " + lastName;
+    }
+
+    public void setVisible(Boolean visible)
+    {
+        this.visible = visible;
+    }
+
+    public Boolean isVisible()
+    {
+        return visible;
     }
 
     public static PersonBuilder makePerson()
