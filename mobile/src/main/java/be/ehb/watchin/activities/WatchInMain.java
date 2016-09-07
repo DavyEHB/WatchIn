@@ -6,6 +6,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.design.widget.TabLayout;
@@ -21,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Map;
@@ -350,6 +350,7 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
             if (isScanning) {
                 ResultReceiver rec = new ResultReceiver(new Handler())
                 {
+                    //TODO Complete on receive handler
                     @Override
                     protected void onReceiveResult(int resultCode, Bundle resultData) {
                         super.onReceiveResult(resultCode, resultData);
@@ -365,6 +366,21 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
                 BeaconScannerService.stopScanning(this);
             }
             return true;
+        } else if (id == R.id.action_enter_event){
+            try {
+
+                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+
+                startActivityForResult(intent, 0);
+
+            } catch (Exception e) {
+
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
+                startActivity(marketIntent);
+
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -473,5 +489,20 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
 
     public void onListEventItemClick(View view){
         Log.d(TAG,"event Item click");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                Log.d(TAG, "onActivityResult: " + contents);
+            }
+            if(resultCode == RESULT_CANCELED){
+                //handle cancel
+            }
+        }
     }
 }

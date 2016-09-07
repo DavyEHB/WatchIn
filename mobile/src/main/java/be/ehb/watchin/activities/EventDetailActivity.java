@@ -1,5 +1,6 @@
 package be.ehb.watchin.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -121,6 +122,12 @@ public class EventDetailActivity extends AppCompatActivity implements PersonList
     @Override
     public void onError() {
 
+    }
+
+    public void onGenerateQRClick(View view) {
+        Intent intent = new Intent(this,QRGenActivity.class);
+        intent.putExtra(QRGenActivity.EVENT,mEvent);
+        startActivity(intent);
     }
 
 }

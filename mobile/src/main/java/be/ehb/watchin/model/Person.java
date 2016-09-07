@@ -29,6 +29,7 @@ public class Person implements Serializable {
     private Map<Integer,Person> meetings = new HashMap<>();
     private int ID;
     private Boolean visible;
+    private int currentEventID;
 
     public Person() {
     }
@@ -128,6 +129,14 @@ public class Person implements Serializable {
         return visible;
     }
 
+    public void setCurrentEventID(int currentEventID) {
+        this.currentEventID = currentEventID;
+    }
+
+    public int getCurrentEventID() {
+        return currentEventID;
+    }
+
     public static PersonBuilder makePerson()
     {
         return new PersonBuilder();
@@ -173,4 +182,6 @@ public class Person implements Serializable {
                 "\n\t#Contacts: " + Contacts().size() +
                 "\n\tSkills: " + Skills().toString();
     }
+
+
 }

@@ -67,6 +67,7 @@ public class PersonRestService extends IntentService {
     private static final String JSON_EMAIL = "email";
     private static final String JSON_VISIBLE = "visible";
     private static final String JSON_PHOTO = "photo";
+    private static final String JSON_CURRENT_EVENT_ID = "currentEventID";
 
 
 
@@ -347,6 +348,7 @@ public class PersonRestService extends IntentService {
             person.setEmail(jsonObject.getString(JSON_EMAIL));
             person.setVisible(jsonObject.getBoolean(JSON_VISIBLE));
             person.setPhoto(getBitmapFromString(jsonObject.getString(JSON_PHOTO)));
+            person.setCurrentEventID(jsonObject.getInt(JSON_CURRENT_EVENT_ID));
             return person;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -367,6 +369,7 @@ public class PersonRestService extends IntentService {
             jsonObject.put(JSON_EMAIL,person.getEmail());
             jsonObject.put(JSON_VISIBLE,person.isVisible());
             jsonObject.put(JSON_PHOTO, getStringFromBitmap(person.getPhoto()));
+            jsonObject.put(JSON_CURRENT_EVENT_ID,person.getCurrentEventID());
 
         } catch (JSONException e) {
             e.printStackTrace();
