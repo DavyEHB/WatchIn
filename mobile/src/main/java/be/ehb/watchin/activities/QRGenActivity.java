@@ -49,7 +49,7 @@ public class QRGenActivity extends AppCompatActivity {
         BitMatrix result;
         try {
             result = new MultiFormatWriter().encode(str,
-                    BarcodeFormat.QR_CODE, WIDTH , WIDTH, null);
+                    BarcodeFormat.AZTEC, WIDTH , WIDTH, null);
         } catch (IllegalArgumentException iae) {
             // Unsupported format
             return null;

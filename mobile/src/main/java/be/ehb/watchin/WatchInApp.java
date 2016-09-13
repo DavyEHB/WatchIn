@@ -29,6 +29,7 @@ public class WatchInApp extends Application {
         public static final String contacts = base_path + "contacts/";
         public static final String skills = base_path + "skills/";
         public static final String attendees = base_path + "attendees/";
+        public static final String meeting = base_path + "meetings/";
     }
 
     //private final List<Person> myPersons = new ArrayList<>();

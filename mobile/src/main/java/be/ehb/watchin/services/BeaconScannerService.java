@@ -5,6 +5,9 @@
 package be.ehb.watchin.services;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -14,9 +17,15 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import be.ehb.watchin.R;
+import be.ehb.watchin.activities.WatchInMain;
 
 public class BeaconScannerService extends IntentService {
     private static final String TAG = "BEACON_SCANNER";
@@ -44,13 +54,18 @@ public class BeaconScannerService extends IntentService {
     private static final String PREFS = "WatchInPrefs";
     private static final String EXTRA_RECEIVER = "be.ehb.watchin.services.extra.RECEIVER";
 
+    private static final int FOUND_BEACON = 2;
+
     private BluetoothAdapter mBluetoothAdapter;
 
     private Map<String, Long> detectedDeviceList = new ConcurrentHashMap<>();
     private int postedNotificationCount;
 
-    private static final String ACTION_SCAN = "be.ehb.watchin.services.action.START";
-    private static final String ACTION_STOP = "be.ehb.watchin.services.action.STOP";
+    public static final String ACTION_SCAN = "be.ehb.watchin.services.action.START";
+    public static final String ACTION_STOP = "be.ehb.watchin.services.action.STOP";
+
+
+    public static final String BUN_BEACON = "be.ehb.watchin.BUN_BEACON";
 
     private BluetoothLeScanner mBluetoothLeScanner;
     private static ScanSettings mScanSettings;
@@ -110,7 +125,6 @@ public class BeaconScannerService extends IntentService {
         if (initBLE()) {
             mBluetoothLeScanner.stopScan(mScanCallback);
         }
-
     }
 
     private void handleActionScan(ResultReceiver receiver) {
@@ -118,6 +132,7 @@ public class BeaconScannerService extends IntentService {
         mReceiver = receiver;
         if (initBLE()) {
             mBluetoothLeScanner.startScan(mScanFilterList,mScanSettings,mScanCallback);
+            showNotification();
         }
     }
 
@@ -151,7 +166,7 @@ public class BeaconScannerService extends IntentService {
         ScanFilter sf = new ScanFilter.Builder()
                 .setDeviceAddress(addr)
                 .build();
-        mScanFilterList.add(sf);
+        //mScanFilterList.add(sf);
 
 
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
@@ -179,219 +194,52 @@ public class BeaconScannerService extends IntentService {
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             Bundle bundle = new Bundle();
-            bundle.putParcelable("Device" , result);
-            mReceiver.send(15,bundle);
+            bundle.putParcelable(BUN_BEACON, result);
+            mReceiver.send(FOUND_BEACON,bundle);
+            /*
             if(result.getRssi()>RSSI_THRESHOLD){
                 String time = DateFormat.getDateTimeInstance().format(new Date());
                 Log.d(TAG, "Found device: " + result.getDevice().getAddress() + " @ " + time);
             }
+            */
         }
     };
 
 
-    /*
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        switch (intent.getAction()){
-            case Constants.MAIN_START:
-                startScanning();
-                break;
-            case Constants.MAIN_STOP:
-                stopScanning();
-                break;
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-    */
-/*
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mHandler = new Handler();
-        mMainHandler = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(Message message) {
-                if (message.what == SHOW_TOAST){
-                    Toast.makeText(getApplicationContext(), (CharSequence) message.obj, Toast.LENGTH_SHORT).show();
-                } else if (message.what == SHOW_TOAST_VIBRATING){
-                    Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
-                    v.vibrate(1000);
-                    Toast.makeText(getApplicationContext(), (CharSequence) message.obj, Toast.LENGTH_LONG).show();
-                } else if (message.what == POST_NOTIFICATION) {
-                    Task task = (Task) message.obj;
-                    Log.d(TAG,"Post Notif " + task.toString());
-                    if (task != null){
-                        CardNotification cardNotification = new CardNotification(task);
+    private void showNotification(){
 
-                        Notification[] notifications = cardNotification.buildNotifications(getApplicationContext());
+        Intent notificationIntent = new Intent(this, WatchInMain.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
 
-                        // Post new notifications
-                        for (int i = 0; i < notifications.length; i++) {
-                            NotificationManagerCompat.from(getApplicationContext()).notify(i, notifications[i]);
-                        }
+        Intent stopIntent = new Intent(this, WatchInMain.class);
+        stopIntent.setAction(WatchInMain.ACTION_STOP_SCANNING);
+        PendingIntent pendingStopIntent = PendingIntent.getActivity(this, 0,
+                stopIntent, 0);
 
-                        // Cancel any that are beyond the current count.
-                        for (int i = notifications.length; i < postedNotificationCount; i++) {
-                            NotificationManagerCompat.from(getApplicationContext()).cancel(i);
-                        }
-                        postedNotificationCount = notifications.length;
-                    }
-                } else if (message.what == CANCEL_NOTIFICATION){
-                    NotificationManagerCompat.from(getApplicationContext()).cancelAll();
-                }
-            }
-        };
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle("WatchIn Scanning")
+                .setTicker("WatchIn - scanning people")
+                .setSmallIcon(R.drawable.ic_media_play)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setAutoCancel(false)
+                .setLocalOnly(true)
+                .setShowWhen(false)
+                .addAction(android.R.drawable.ic_media_pause,
+                        "Stop scanning", pendingStopIntent)
+                .build();
+
+
+        NotificationManager notificationManger =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManger.notify(1, notification);
 
 
 
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            stopSelf();
-        }
-
-        if (intent.getAction().equals(Constants.START_ACTION)) {
-            Log.i(TAG, "Received Start Foreground Intent ");
-
-            taskArrayList.addAll(TaskDAO.getInstance(this).getAll());
-            if (taskArrayList != null) {
-                for (Task t : taskArrayList) {
-                    t.setCards(CardDAO.getInstance(this).getByTaskID(t.getID()));
-                }
-            }
-
-            Intent notificationIntent = new Intent(this, SelectorActivity.class);
-            notificationIntent.setAction(Constants.MAIN_ACTION);
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                    notificationIntent, 0);
-
-            Intent startIntent = new Intent(this, BeaconScanner.class);
-            startIntent.setAction(Constants.STOP_ACTION);
-            PendingIntent pStopIntent = PendingIntent.getService(this, 0,
-                    startIntent, 0);
-
-            Bitmap icon = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_media_play);
-
-            Notification notification = new NotificationCompat.Builder(this)
-                    .setContentTitle("TaskAID")
-                    .setTicker("TaskAID")
-                    .setContentText("Scanning")
-                    .setSmallIcon(R.drawable.ic_media_play)
-                    .setLargeIcon(
-                            Bitmap.createScaledBitmap(icon, 128, 128, false))
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .addAction(android.R.drawable.ic_media_pause,
-                            "Stop scanning", pStopIntent)
-                    .build();
-
-            startLeScan();
-            scanDetectedDeviceList();
-
-            startForeground(Constants.NOTIFICATION_ID,
-                    notification);
-        } else if (intent.getAction().equals(Constants.STOP_ACTION)) {
-            Log.i(TAG, "Clicked Stop");
-            stopLeScan();
-            stopForeground(true);
-            stopSelf();
-        }
-        return START_STICKY;
     }
 
-    private void startLeScan() {
-        mScanning = true;
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG,"Scanning " + i++);
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
-
-                if (mScanning) {
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG,"Waiting");
-                            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                            if (mScanning) {
-                                startLeScan();
-                            }
-                        }
-                    },SCAN_INTERVAL);
-                }
-            }
-        }, SCAN_PERIOD);
-    }
-
-    private void scanDetectedDeviceList(){
-        long timeNow = System.currentTimeMillis();
-        Log.d(TAG,"Checking detected list");
-        for (String device : detectedDeviceList.keySet()){
-            Log.d(TAG,"Removable?: " + device + " - TimeStamp: " + detectedDeviceList.get(device) + " Now: " + timeNow + " Difference: " + (timeNow -  detectedDeviceList.get(device)));
-            if ((detectedDeviceList.get(device) + REMOVE_DELAY) <= timeNow ){
-
-                Message message = mMainHandler.obtainMessage(SHOW_TOAST,"Removed: " + device);
-                message.sendToTarget();
-                message = mMainHandler.obtainMessage(CANCEL_NOTIFICATION);
-                message.sendToTarget();
-                detectedDeviceList.remove(device);
-            }
-        }
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mScanning) {
-                    scanDetectedDeviceList();
-                }
-            }
-        },REMOVE_INTERVAL);
-    }
-
-    private void stopLeScan(){
-        mScanning = false;
-        mBluetoothAdapter.stopLeScan(mLeScanCallback);
-    }
-
-    private static int i;
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
-
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    if (rssi >= RSSI_THRESHOLD) {
-                        if (!detectedDeviceList.containsKey(device.getAddress())) {
-                            Task task = checkTaskList(device);
-                            if (task != null) {
-                                Log.d(TAG, "Task detected: " + task.toString());
-
-                                //Message message = mMainHandler.obtainMessage(SHOW_TOAST_VIBRATING,"Task detected: " + task.toString());
-                                Message message = mMainHandler.obtainMessage(POST_NOTIFICATION,task);
-                                message.sendToTarget();
-                                detectedDeviceList.put(device.getAddress(),System.currentTimeMillis());
-                            }
-                        }
-                        detectedDeviceList.put(device.getAddress(), System.currentTimeMillis());
-                    }
-                }
-            };
-
-
-    private Task checkTaskList(BluetoothDevice device) {
-        for (Task  task : taskArrayList){
-            if (device.getAddress().equals(task.getBeaconAddress())){
-                return task;
-            }
-        }
-        return null;
-    }
-    */
 }

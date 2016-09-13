@@ -1,38 +1,23 @@
 package be.ehb.watchin.activities;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import be.ehb.watchin.R;
 import be.ehb.watchin.WatchInApp;
+import be.ehb.watchin.builders.PersonBuilder;
 import be.ehb.watchin.model.Event;
 import be.ehb.watchin.model.Person;
 import be.ehb.watchin.services.AttendeeDAO.AttendeeRestService;
@@ -41,14 +26,24 @@ import be.ehb.watchin.services.BeaconScannerService;
 import be.ehb.watchin.services.ContactDAO.ContactRestService;
 import be.ehb.watchin.services.ContactDAO.ContactResultReceiver;
 import be.ehb.watchin.services.EventDAO.EventResultReceiver;
-import be.ehb.watchin.services.PersonDAO.PersonRestService;
-import be.ehb.watchin.services.PersonDAO.PersonResultReceiver;
+
+
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.NotificationCompat.WearableExtender;
+
 
 public class TempLauncher extends Activity implements ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee {
 
     private static final String TAG = "TempLauncher";
+    private static final long DELAYED_DELETE = 10000;
 
     private TextView tv1;
+    private Map<Person,Runnable> detectedPerson = new HashMap<>();
+    private int i;
+    private Person lastPerson;
+
+    private static final Handler hDelayedDelete  = new Handler();
 
 
     @Override
@@ -195,32 +190,58 @@ public class TempLauncher extends Activity implements ContactResultReceiver.Rece
     }
 
     public void onClickBtn1(View view) {
-        BeaconScannerService.stopScanning(this);
+        //BeaconScannerService.stopScanning(this);
+        addToList(lastPerson);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NotificationManagerCompat.from(getApplicationContext()).cancelAll();
+    }
 
     public void onClickBtn3(View view) {
         Log.d(TAG, "btn3 Clicked");
+        Person p = new PersonBuilder().firstName("P" + i++).create();
+        lastPerson = p;
+        addToList(p);
+    }
 
-
-
-
-
+    private void addToList(final Person person){
+        if (!detectedPerson.containsKey(person)){
+            Log.d(TAG, "addToList: not in detected list");
+            Runnable delayedRun = new Runnable() {
+                @Override
+                public void run() {
+                    detectedPerson.remove(person);
+                    Log.d(TAG, "run: Removed person");
+                    Log.d(TAG, "run: " + detectedPerson.toString());
+                }
+            };
+            hDelayedDelete.postDelayed(delayedRun, DELAYED_DELETE);
+            detectedPerson.put(person,delayedRun);
+            Log.d(TAG, "addToList: Added");
+            Log.d(TAG, "addToList: " + detectedPerson.toString());
+        }
+        else
+        {
+            Log.d(TAG, "addToList: Already in list");
+            Log.d(TAG, "addToList: " + detectedPerson.toString());
+            Runnable rOldRun = detectedPerson.get(person);
+            hDelayedDelete.removeCallbacks(rOldRun);
+            Runnable delayedRun = new Runnable() {
+                @Override
+                public void run() {
+                    detectedPerson.remove(person);
+                    Log.d(TAG, "run: Removed person");
+                    Log.d(TAG, "run: " + detectedPerson.toString());
+                }
+            };
+            hDelayedDelete.postDelayed(delayedRun,DELAYED_DELETE);
+            detectedPerson.put(person,delayedRun);
+        }
     }
 
 
-    /*DAO Call to log in to venue
-    AttendeeResultReceiver attendeeResultReceiver = new AttendeeResultReceiver(new AttendeeResultReceiver.ReceiveAttendee() {
-        @Override
-        public void onReceiveAttendee(Bundle attendee) {
-            Log.d(TAG, "onReceiveAttendee: ");
-        }
-
-        @Override
-        public void onError() {
-
-        }
-    });
-    AttendeeRestService.startActionUpdate(this,4,1,false,attendeeResultReceiver);
-    */
 }

@@ -17,4 +17,10 @@
         android:orderInCategory="100"
         android:title="@string/enter_event"/>
 
+    <item
+        android:id="@+id/action_leave_event"
+        android:orderInCategory="100"
+        android:visible="false"
+        android:title="@string/leave_event"/>
+
 </menu>

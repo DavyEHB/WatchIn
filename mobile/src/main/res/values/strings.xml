@@ -27,5 +27,6 @@
     <string name="action_stop_scan">Stop</string>
     <string name="scanning">Scanning</string>
     <string name="enter_event">Enter event</string>
+    <string name="leave_event">Leave Event</string>
 
 </resources>

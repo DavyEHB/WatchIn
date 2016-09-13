@@ -51,8 +51,7 @@
         <activity
             android:name=".activities.EventDetailActivity"
             android:screenOrientation="portrait" />
-
-        <activity android:name=".activities.QRGenActivity"></activity>
+        <activity android:name=".activities.QRGenActivity" />
 
         <service
             android:name=".services.PersonDAO.PersonRestService"
@@ -72,8 +71,10 @@
         <service
             android:name=".services.BeaconScannerService"
             android:exported="false" />
-
-
+        <service
+            android:name=".services.MeetingDAO.MeetingRestService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
