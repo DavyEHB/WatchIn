@@ -61,7 +61,7 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
         SkillResultReceiver.ReceiveSkill,ContactResultReceiver.ReceiveContact, EventResultReceiver.ReceiveEvent, AttendeeResultReceiver.ReceiveAttendee, PersonalDetail.OnPersonDetailInteractionListener, MeetingResultReceiver.ReceiveMeeting {
 
     private static final String TAG = "WatchinMain";
-    private static final long DELAYED_DELETE = 10000;
+    private static final long DELAYED_DELETE = 30000;
 
 
     /**
@@ -487,8 +487,14 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
                     Person Me = ((WatchInApp) getApplication()).Me();
                     for (Person p : Me.Meetings().values()){
                         Log.d(TAG, "PersonBeacon: " + p.getBeaconID());
-                        if (p.getBeaconID().equals(result.getDevice().getAddress())){
-                            addToList(p);
+                        if (p.isVisible()) {
+                            Log.d(TAG, "onReceiveResult: Visible");
+                            if ((p.getCurrentEventID() != 0)  && (p.getCurrentEventID() == Me.getCurrentEventID())) {
+                                Log.d(TAG, "onReceiveResult: Same event");
+                                if (p.getBeaconID().equals(result.getDevice().getAddress())) {
+                                    addToList(p);
+                                }
+                            }
                         }
                     }
                 }
@@ -550,7 +556,8 @@ public class WatchInMain extends AppCompatActivity implements EventListFragment.
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_people_black_24dp   )
+                        .setSmallIcon(R.drawable.ic_people_black_24dp
+                        )
                         .setContentTitle(person.getFullname())
                         .setContentText(person.getFirstName() + " is within range")
                         .setContentIntent(viewPendingIntent)

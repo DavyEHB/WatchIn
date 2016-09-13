@@ -71,7 +71,7 @@ public class BeaconScannerService extends IntentService {
     private static ScanSettings mScanSettings;
     private static List<ScanFilter> mScanFilterList = new ArrayList<>();
 
-    public static int RSSI_THRESHOLD = 100;
+    public static int RSSI_THRESHOLD = -80;
 
     private static ResultReceiver mReceiver;
 
@@ -195,13 +195,13 @@ public class BeaconScannerService extends IntentService {
             super.onScanResult(callbackType, result);
             Bundle bundle = new Bundle();
             bundle.putParcelable(BUN_BEACON, result);
-            mReceiver.send(FOUND_BEACON,bundle);
-            /*
+            //mReceiver.send(FOUND_BEACON,bundle);
+            Log.d(TAG, "onScanResult: " + result.getRssi());
             if(result.getRssi()>RSSI_THRESHOLD){
                 String time = DateFormat.getDateTimeInstance().format(new Date());
                 Log.d(TAG, "Found device: " + result.getDevice().getAddress() + " @ " + time);
+                mReceiver.send(FOUND_BEACON,bundle);
             }
-            */
         }
     };
 
